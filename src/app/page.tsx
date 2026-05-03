@@ -1,45 +1,61 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { AppShell } from '@/modules/shared/components/layout/app-shell';
-import { EmptyState } from '@/modules/shared/components/ui/empty-state';
+import { MoodPicker } from '@/modules/emotional/components/mood-picker';
+import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
+import { emotionalService } from '@/modules/emotional/services/emotional-service';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
+import type { EmotionalCheckin } from '@/modules/emotional/types';
 
 export default function DashboardPage() {
+  const [todayCheckin, setTodayCheckin] = useState<EmotionalCheckin | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const init = async () => {
+      try { setTodayCheckin(await emotionalService.getToday()); } catch {}
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  if (loading) return <AppShell title="Inicio"><PageLoading /></AppShell>;
+
+  if (!todayCheckin) {
+    return (
+      <AppShell title="Inicio">
+        <MoodPicker onComplete={() => window.location.reload()} />
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell title="Inicio">
       <div className="p-4 space-y-4">
-        {/* Today summary card */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-            Hoy
-          </p>
-          <h2 className="mt-1 text-2xl font-bold text-gray-900">
-            Buen dia
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Registra como te sientes para empezar
-          </p>
-        </div>
+        <MoodStateBanner checkin={todayCheckin} onChange={() => setTodayCheckin(null)} />
 
-        {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm
-            active:scale-[0.98] transition-transform cursor-pointer">
-            <span className="text-3xl">&#128522;</span>
-            <p className="mt-2 text-sm font-medium text-gray-900">Check-in</p>
-            <p className="text-xs text-gray-400">Como te sientes?</p>
-          </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm
-            active:scale-[0.98] transition-transform cursor-pointer">
-            <span className="text-3xl">&#128221;</span>
+          <Link
+            href="/tareas"
+            className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm
+              active:scale-[0.98] transition-transform"
+          >
+            <span className="text-3xl">📝</span>
             <p className="mt-2 text-sm font-medium text-gray-900">Tareas</p>
             <p className="text-xs text-gray-400">Organiza tu dia</p>
-          </div>
+          </Link>
+          <Link
+            href="/regular"
+            className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm
+              active:scale-[0.98] transition-transform"
+          >
+            <span className="text-3xl">🧘</span>
+            <p className="mt-2 text-sm font-medium text-gray-900">Bienestar</p>
+            <p className="text-xs text-gray-400">Respira y relajate</p>
+          </Link>
         </div>
-
-        {/* Empty state placeholder */}
-        <EmptyState
-          icon="&#129504;"
-          title="Empieza tu viaje"
-          description="Haz tu primer check-in emocional para comenzar a ver tu progreso y recibir recomendaciones personalizadas."
-        />
       </div>
     </AppShell>
   );
