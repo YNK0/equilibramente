@@ -7,49 +7,69 @@ import Link from 'next/link';
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [registered, setRegistered] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Las contrasenas no coinciden');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('La contrasena debe tener al menos 8 caracteres');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithOtp({
+      const { error: authError } = await supabase.auth.signUp({
         email,
+        password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: { display_name: displayName },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (authError) throw authError;
-      setSent(true);
+      setRegistered(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
+      const msg = err instanceof Error ? err.message : 'Error al crear la cuenta';
+      if (msg.includes('already registered') || msg.includes('already exists')) {
+        setError('Este correo ya esta registrado. Inicia sesion.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  if (sent) {
+  if (registered) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-purple-50/30 px-4">
         <div className="w-full max-w-sm text-center">
           <div className="text-4xl mb-4">&#9993;</div>
-          <h1 className="text-xl font-bold text-gray-900">Revisa tu correo</h1>
+          <h1 className="text-xl font-bold text-gray-900">Confirma tu correo</h1>
           <p className="mt-2 text-sm text-gray-500">
-            Enviamos un enlace magico a <strong>{email}</strong>. Abrelo para completar tu registro.
+            Enviamos un enlace de confirmacion a <strong>{email}</strong>.
+            Abrelo para activar tu cuenta y empezar a usar EquilibraMente.
           </p>
-          <button
-            onClick={() => setSent(false)}
-            className="mt-6 text-sm text-purple-600 hover:text-purple-700"
+          <Link
+            href="/auth/login"
+            className="mt-6 inline-block text-sm text-purple-600 hover:text-purple-700 font-medium"
           >
-            Usar otro correo
-          </button>
+            Ir a iniciar sesion
+          </Link>
         </div>
       </div>
     );
@@ -85,7 +105,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Correo universitario
+              Correo electronico
             </label>
             <input
               id="email"
@@ -99,13 +119,45 @@ export default function RegisterPage() {
             />
           </div>
 
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Contrasena
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Minimo 8 caracteres"
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-200"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              Confirmar contrasena
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repite tu contrasena"
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-200"
+              autoComplete="new-password"
+            />
+          </div>
+
           {error && (
             <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <button
             type="submit"
-            disabled={loading || !email || !displayName}
+            disabled={loading || !email || !displayName || !password || !confirmPassword}
             className="w-full rounded-xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Creando cuenta...' : 'Crear cuenta'}

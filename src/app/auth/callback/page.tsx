@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function AuthCallbackPage() {
+function CallbackContent() {
   const router = useRouter();
-  const [error, setError] = useState('');
+  const searchParams = useSearchParams();
+  const confirmed = searchParams.get('confirmed');
+  const [status, setStatus] = useState<'loading' | 'confirmed' | 'redirecting' | 'error'>('loading');
+  const [errorMsg, setErrorMsg] = useState('');
   const processed = useRef(false);
 
   useEffect(() => {
@@ -15,41 +19,85 @@ export default function AuthCallbackPage() {
 
     const supabase = createClient();
 
-    // The hash fragment contains the auth tokens from magic link
-    // Supabase client automatically handles the hash exchange
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        router.push('/');
-        router.refresh();
-      }
-    });
+    if (confirmed === 'true') {
+      setStatus('confirmed');
+      return;
+    }
 
-    // Also check if already have a session (hash already processed)
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Poll for session — Supabase auto-processes the hash fragment
+    let attempts = 0;
+    const maxAttempts = 20;
+    const interval = setInterval(async () => {
+      attempts++;
+      const { data: { session } } = await supabase.auth.getSession();
+
       if (session) {
+        clearInterval(interval);
+        setStatus('redirecting');
+        router.push('/');
+        router.refresh();
+        return;
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setStatus('redirecting');
+        // Redirect anyway — middleware will handle redirect to login if no session
         router.push('/');
         router.refresh();
       }
-    });
-  }, [router]);
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [router, confirmed]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-purple-50/30 px-4">
       <div className="w-full max-w-sm text-center">
-        {error ? (
+        {status === 'confirmed' ? (
+          <>
+            <div className="text-4xl mb-4">&#10004;</div>
+            <h1 className="text-xl font-bold text-green-600">Correo confirmado</h1>
+            <p className="mt-2 text-sm text-gray-500">
+              Tu cuenta esta activa. Ya puedes iniciar sesion.
+            </p>
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="mt-6 rounded-xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 transition-colors"
+            >
+              Ir a iniciar sesion
+            </button>
+          </>
+        ) : status === 'error' ? (
           <>
             <div className="text-4xl mb-4">&#10060;</div>
             <h1 className="text-xl font-bold text-gray-900">Error de autenticacion</h1>
-            <p className="mt-2 text-sm text-red-600">{error}</p>
+            <p className="mt-2 text-sm text-red-600">{errorMsg}</p>
           </>
         ) : (
           <>
             <div className="text-4xl mb-4 animate-pulse">&#129504;</div>
-            <h1 className="text-xl font-bold text-gray-900">Iniciando sesion...</h1>
-            <p className="mt-2 text-sm text-gray-500">Verificando tu identidad</p>
+            <h1 className="text-xl font-bold text-gray-900">
+              {status === 'redirecting' ? 'Redirigiendo...' : 'Verificando identidad...'}
+            </h1>
           </>
         )}
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-purple-50/30 px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="text-4xl mb-4 animate-pulse">&#129504;</div>
+          <h1 className="text-xl font-bold text-gray-900">Cargando...</h1>
+        </div>
+      </div>
+    }>
+      <CallbackContent />
+    </Suspense>
   );
 }
