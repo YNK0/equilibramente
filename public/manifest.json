@@ -1,0 +1,11 @@
+{
+  "name": "EquilibraMente",
+  "short_name": "EquilibraMente",
+  "description": "Autorregulacion y bienestar para universitarios",
+  "theme_color": "#7c3aed",
+  "background_color": "#faf5ff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/dashboard",
+  "icons": []
+}
