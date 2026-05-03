@@ -2,15 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LoadIndicator } from '@/modules/analysis/components/load-indicator';
 import { StressAlert } from '@/modules/analysis/components/stress-alert';
 import { useLoadAnalysis } from '@/modules/analysis/hooks/use-load-analysis';
 import type { LoadLevel } from '@/modules/analysis/types';
+import { onDataChanged } from '@/modules/analysis/services/analysis-trigger';
 import { MoodPicker } from '@/modules/emotional/components/mood-picker';
 import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
 import { emotionalService } from '@/modules/emotional/services/emotional-service';
 import type { EmotionalCheckin } from '@/modules/emotional/types';
+import { monitoringService } from '@/modules/monitoring/services/monitoring-service';
+import type { TodayData } from '@/modules/monitoring/types';
 import { RecommendationBanner } from '@/modules/recommendations/components/recommendation-banner';
 import { useRecommendations } from '@/modules/recommendations/hooks/use-recommendations';
 import { AppShell } from '@/modules/shared/components/layout/app-shell';
@@ -19,16 +22,27 @@ import { PageLoading } from '@/modules/shared/components/ui/loading';
 export default function DashboardPage() {
   const router = useRouter();
   const [todayCheckin, setTodayCheckin] = useState<EmotionalCheckin | null>(null);
+  const [todayData, setTodayData] = useState<TodayData | null>(null);
   const [loadingCheckin, setLoadingCheckin] = useState(true);
   const { analysis, loading: loadingAnalysis } = useLoadAnalysis();
   const { recommendations, loadLevel, dismiss, sendFeedback } = useRecommendations();
 
-  useEffect(() => {
-    emotionalService
-      .getToday()
-      .then(setTodayCheckin)
-      .finally(() => setLoadingCheckin(false));
+  const loadToday = useCallback(async () => {
+    const [checkin, data] = await Promise.all([
+      emotionalService.getToday(),
+      monitoringService.getToday().catch(() => null),
+    ]);
+    setTodayCheckin(checkin);
+    setTodayData(data);
   }, []);
+
+  useEffect(() => {
+    loadToday().finally(() => setLoadingCheckin(false));
+  }, [loadToday]);
+
+  useEffect(() => {
+    return onDataChanged(() => { loadToday(); });
+  }, [loadToday]);
 
   if (loadingCheckin || loadingAnalysis) {
     return (
@@ -39,6 +53,10 @@ export default function DashboardPage() {
   }
 
   const currentLevel = analysis?.current?.load_level as LoadLevel | undefined;
+  const tasksCompletedToday = todayData?.tasks.completed ?? 0;
+  const tasksTotal = todayData?.tasks.total ?? 0;
+  const activeStreak = todayData?.streak.current ?? 0;
+  const completedToday = todayData?.tasks.completed ?? 0;
 
   return (
     <AppShell title="EquilibraMente">
@@ -58,13 +76,36 @@ export default function DashboardPage() {
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-4">
               <h2 className="text-sm font-semibold text-gray-700 mb-3">Como te sientes hoy?</h2>
-              <MoodPicker
-                onComplete={() => {
-                  emotionalService.getToday().then(setTodayCheckin);
-                }}
-              />
+              <MoodPicker onComplete={() => { loadToday(); }} />
             </div>
           )}
+        </section>
+
+        {/* Today's Activity Summary */}
+        <section className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100">
+            <span className="text-2xl">{todayCheckin ? '✅' : '⬜'}</span>
+            <span className="text-xs font-medium text-gray-700">Check-in</span>
+            <span className="text-[10px] text-gray-400">
+              {todayCheckin ? 'Hecho' : 'Pendiente'}
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100">
+            <span className="text-2xl">
+              {completedToday > 0 ? '📝' : '⬜'}
+            </span>
+            <span className="text-xs font-medium text-gray-700">
+              {completedToday} de {tasksTotal}
+            </span>
+            <span className="text-[10px] text-gray-400">Tareas hoy</span>
+          </div>
+          <div className="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100">
+            <span className="text-2xl">
+              {activeStreak >= 30 ? '💎' : activeStreak >= 7 ? '⭐' : activeStreak >= 3 ? '🔥' : activeStreak > 0 ? '⚡' : '⬜'}
+            </span>
+            <span className="text-xs font-medium text-gray-700">{activeStreak} días</span>
+            <span className="text-[10px] text-gray-400">Racha</span>
+          </div>
         </section>
 
         {/* Load Analysis Section */}

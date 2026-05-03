@@ -58,35 +58,48 @@ export async function POST(req: NextRequest) {
     user_id: user.id,
   };
 
+  let result;
+  let statusCode: number;
+
   if (existing) {
-    const { data, error } = await supabase
+    const { data, error: updateError } = await supabase
       .from('emotional_checkins')
       .update(payload)
       .eq('id', existing.id)
       .select()
       .single();
-    if (error)
+    if (updateError)
       return NextResponse.json(
-        { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+        { data: null, error: { code: 'SERVER_ERROR', message: updateError.message } },
         { status: 500 }
       );
-    return NextResponse.json(
-      { data, error: { code: 'CHECKIN_UPDATED', message: 'Check-in actualizado' } },
-      { status: 200 }
-    );
+    result = { data, error: { code: 'CHECKIN_UPDATED', message: 'Check-in actualizado' } };
+    statusCode = 200;
+  } else {
+    const { data, error: insertError } = await supabase
+      .from('emotional_checkins')
+      .insert(payload)
+      .select()
+      .single();
+    if (insertError)
+      return NextResponse.json(
+        { data: null, error: { code: 'SERVER_ERROR', message: insertError.message } },
+        { status: 500 }
+      );
+
+    // Update check-in streak (fire-and-forget, non-critical)
+    void (async () => {
+      try {
+        const rpc = supabase.rpc as (fn: string, args?: Record<string, unknown>) => PromiseLike<unknown>;
+        await rpc('update_streak', { p_user_id: user.id, p_type: 'checkin', p_activity_date: today });
+      } catch { /* non-critical */ }
+    })();
+
+    result = { data, error: null };
+    statusCode = 201;
   }
 
-  const { data, error } = await supabase
-    .from('emotional_checkins')
-    .insert(payload)
-    .select()
-    .single();
-  if (error)
-    return NextResponse.json(
-      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  return NextResponse.json({ data, error: null }, { status: 201 });
+  return NextResponse.json(result, { status: statusCode });
 }
 
 export async function GET(req: NextRequest) {

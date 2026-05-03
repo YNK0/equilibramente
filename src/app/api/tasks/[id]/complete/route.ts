@@ -30,5 +30,16 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       { data: null, error: { code: 'NOT_FOUND', message: 'Tarea no encontrada' } },
       { status: 404 }
     );
+
+  // Update streak and check achievements (fire-and-forget, non-critical)
+  const today = new Date().toISOString().split('T')[0];
+  void (async () => {
+    try {
+      const rpc = supabase.rpc as (fn: string, args?: Record<string, unknown>) => PromiseLike<unknown>;
+      await rpc('update_streak', { p_user_id: user.id, p_type: 'task_completion', p_activity_date: today });
+      await rpc('check_achievements', { p_user_id: user.id });
+    } catch { /* non-critical */ }
+  })();
+
   return NextResponse.json({ data, error: null });
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { isOnline, offlineDB } from '@/lib/offline-db';
-import { triggerAnalysisRefresh } from '@/modules/analysis/services/analysis-trigger';
+import { triggerDataChanged } from '@/modules/analysis/services/analysis-trigger';
 import { taskService } from '../services/task-service';
 import type { Task, TaskFilters, TaskInsert, TaskStatus, TaskUpdate } from '../types';
 
@@ -68,7 +68,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
 
     try {
       const task = await taskService.create(input);
-      triggerAnalysisRefresh();
+      triggerDataChanged();
       await offlineDB.put('tasks', task as unknown as Record<string, unknown>);
       if (task.status === filters.status) {
         setTasks((prev) => [task, ...prev]);
@@ -90,7 +90,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
   const updateTask = async (id: string, input: TaskUpdate) => {
     try {
       const updated = await taskService.update(id, input);
-      triggerAnalysisRefresh();
+      triggerDataChanged();
       if (updated.status === filters.status) {
         setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
       } else {
@@ -114,7 +114,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
   const completeTask = async (id: string) => {
     try {
       const task = await taskService.complete(id);
-      triggerAnalysisRefresh();
+      triggerDataChanged();
       if (filters.status === 'completed') {
         setTasks((prev) => [task, ...prev]);
         setCount((c) => c + 1);
@@ -149,7 +149,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
   const removeTask = async (id: string) => {
     try {
       await taskService.remove(id);
-      triggerAnalysisRefresh();
+      triggerDataChanged();
     } catch {
       // Already removed optimistically
     }

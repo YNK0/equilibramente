@@ -3,21 +3,31 @@
 import { STREAK_LABELS } from '../constants';
 import { useStreaks } from '../hooks/use-streaks';
 import { StreakBar } from './streak-bar';
+import type { Streak } from '../types';
 
-function getWeekdays(): boolean[] {
+function computeActiveDays(streak: Streak): boolean[] {
   const days: boolean[] = [];
-  const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (!streak.last_activity_date) return [false, false, false, false, false, false, false];
+
+  const lastActivity = new Date(streak.last_activity_date);
+  lastActivity.setHours(0, 0, 0, 0);
+
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now);
+    const d = new Date(today);
     d.setDate(d.getDate() - i);
-    days.push(false);
+
+    const diffFromLast = (lastActivity.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+    days.push(diffFromLast >= 0 && diffFromLast < streak.current_count);
   }
+
   return days;
 }
 
 export function StreakDisplay() {
   const { streaks, loading } = useStreaks();
-  const weekdays = getWeekdays();
 
   if (loading) {
     return (
@@ -66,7 +76,7 @@ export function StreakDisplay() {
             </div>
             <span className="text-xl font-bold text-purple-600">{streak.current_count}</span>
           </div>
-          <StreakBar days={weekdays} />
+          <StreakBar days={computeActiveDays(streak)} />
         </div>
       ))}
     </div>
