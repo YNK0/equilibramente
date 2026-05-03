@@ -10,7 +10,7 @@ import { TaskFilters } from './task-filters';
 import { MiniLoadIndicator } from './mini-load-indicator';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
 import { useTasks } from '../hooks/use-tasks';
-import type { Task, TaskFormData, TaskStatus } from '../types';
+import type { Task, TaskFormData, TaskInsert, TaskStatus } from '../types';
 
 export function TaskList() {
   const { tasks, count, loading, create, updateTask, completeTask, removeTask, setStatusFilter, filters } = useTasks();
@@ -24,9 +24,8 @@ export function TaskList() {
       due_date: data.due_date,
       estimated_minutes: data.estimated_minutes,
       description: data.description,
-      user_id: '',
       status: 'pending',
-    });
+    } as TaskInsert);
     setShowForm(false);
   }, [create]);
 
