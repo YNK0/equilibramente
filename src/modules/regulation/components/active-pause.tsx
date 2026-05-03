@@ -1,24 +1,30 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { PauseExercise } from './pause-exercise';
 import { MoodComparison } from './mood-comparison';
-import { useRegulationSession } from '../hooks/use-regulation-session';
+import { regulationService } from '../services/regulation-service';
 import { ACTIVE_PAUSE_SEQUENCE } from '../constants';
 
 export function ActivePause() {
   const [step, setStep] = useState(0);
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const { startSession, completeSession } = useRegulationSession();
-  const startTimeRef = { current: 0 };
+  const [error, setError] = useState<string | null>(null);
+  const startTimeRef = useRef(0);
+  const sessionIdRef = useRef<string | null>(null);
 
   const handleStart = useCallback(async () => {
-    await startSession('active_pause');
+    setError(null);
     startTimeRef.current = Date.now();
     setStarted(true);
-  }, [startSession]);
+    // Fire-and-forget: don't block exercise start on DB
+    regulationService.startSession('active_pause').then((s) => {
+      sessionIdRef.current = s.id;
+    }).catch(() => {
+      // Session continues locally even if DB fails
+    });
+  }, []);
 
   const handleExerciseComplete = useCallback(() => {
     if (step < ACTIVE_PAUSE_SEQUENCE.length - 1) {
@@ -30,9 +36,14 @@ export function ActivePause() {
 
   const handleComplete = useCallback(async (moodAfter: string | null) => {
     const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
-    setElapsedSeconds(elapsed);
-    await completeSession(elapsed, moodAfter);
-  }, [completeSession]);
+    if (sessionIdRef.current && elapsed >= 30) {
+      try {
+        await regulationService.completeSession(sessionIdRef.current, elapsed, moodAfter);
+      } catch {
+        // Session tracking is best-effort
+      }
+    }
+  }, []);
 
   if (!started) {
     return (
@@ -44,6 +55,7 @@ export function ActivePause() {
         <p className="text-sm text-gray-500 text-center">
           {ACTIVE_PAUSE_SEQUENCE.length} ejercicios rápidos para despejarte
         </p>
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <button
           onClick={handleStart}
           className="px-8 py-3 rounded-full bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors"
@@ -58,13 +70,11 @@ export function ActivePause() {
     return <MoodComparison before={null} after={null} onAfterChange={handleComplete} />;
   }
 
-  const exercise = ACTIVE_PAUSE_SEQUENCE[step];
-
   return (
     <div>
       <PauseExercise
         key={step}
-        exercise={exercise}
+        exercise={ACTIVE_PAUSE_SEQUENCE[step]}
         onComplete={handleExerciseComplete}
         onSkip={handleExerciseComplete}
       />

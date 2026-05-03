@@ -22,6 +22,7 @@ interface UseBreathingResult {
 
 export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResult {
   const pattern = BREATHING_PATTERNS[patternKey];
+
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [cycle, setCycle] = useState(1);
   const [progress, setProgress] = useState(0);
@@ -30,44 +31,57 @@ export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResul
   const [isCompleted, setIsCompleted] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
+  const activeRef = useRef(false);
   const animFrameRef = useRef(0);
   const phaseStartRef = useRef(0);
   const exerciseStartRef = useRef(0);
-  const pausedElapsedRef = useRef(0);
+  const phaseIndexRef = useRef(0);
+  const cycleRef = useRef(1);
+
   const currentPhase = pattern.phases[phaseIndex];
 
   const animate = useCallback((timestamp: number) => {
     if (!phaseStartRef.current) phaseStartRef.current = timestamp;
     if (!exerciseStartRef.current) exerciseStartRef.current = timestamp;
 
-    const elapsed = (timestamp - phaseStartRef.current) / 1000;
-    const phaseProgress = Math.min(elapsed / currentPhase.duration, 1);
+    const phaseElapsed = (timestamp - phaseStartRef.current) / 1000;
+    const currentDuration = pattern.phases[phaseIndexRef.current]?.duration ?? 1;
+    const phaseProgress = Math.min(phaseElapsed / currentDuration, 1);
+
     setProgress(phaseProgress);
     setElapsedSeconds((timestamp - exerciseStartRef.current) / 1000);
 
     if (phaseProgress >= 1) {
       phaseStartRef.current = timestamp;
-      const nextIdx = phaseIndex + 1;
+      const nextIdx = phaseIndexRef.current + 1;
+
       if (nextIdx >= pattern.phases.length) {
-        const nextCycle = cycle + 1;
+        const nextCycle = cycleRef.current + 1;
         if (nextCycle > pattern.cycles) {
+          activeRef.current = false;
           setIsActive(false);
           setIsCompleted(true);
           return;
         }
+        cycleRef.current = nextCycle;
+        phaseIndexRef.current = 0;
         setCycle(nextCycle);
         setPhaseIndex(0);
       } else {
+        phaseIndexRef.current = nextIdx;
         setPhaseIndex(nextIdx);
       }
     }
 
-    if (isActive) {
+    if (activeRef.current) {
       animFrameRef.current = requestAnimationFrame(animate);
     }
-  }, [currentPhase, phaseIndex, cycle, pattern, isActive]);
+  }, [pattern]);
 
   const start = useCallback(() => {
+    activeRef.current = true;
+    phaseIndexRef.current = 0;
+    cycleRef.current = 1;
     setIsActive(true);
     setIsPaused(false);
     setIsCompleted(false);
@@ -77,24 +91,26 @@ export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResul
     setElapsedSeconds(0);
     phaseStartRef.current = 0;
     exerciseStartRef.current = 0;
-    pausedElapsedRef.current = 0;
     animFrameRef.current = requestAnimationFrame(animate);
   }, [animate]);
 
   const pause = useCallback(() => {
-    setIsPaused(true);
+    activeRef.current = false;
     setIsActive(false);
+    setIsPaused(true);
     cancelAnimationFrame(animFrameRef.current);
   }, []);
 
   const resume = useCallback(() => {
-    setIsPaused(false);
+    activeRef.current = true;
     setIsActive(true);
+    setIsPaused(false);
     phaseStartRef.current = performance.now() - (progress * currentPhase.duration * 1000);
     animFrameRef.current = requestAnimationFrame(animate);
   }, [animate, progress, currentPhase.duration]);
 
   const stop = useCallback(() => {
+    activeRef.current = false;
     setIsActive(false);
     setIsPaused(false);
     cancelAnimationFrame(animFrameRef.current);
@@ -106,7 +122,7 @@ export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResul
 
   const totalPhases = pattern.phases.length * pattern.cycles;
   const completedPhases = (cycle - 1) * pattern.phases.length + phaseIndex;
-  const overallProgress = (completedPhases + progress) / totalPhases;
+  const overallProgress = totalPhases > 0 ? (completedPhases + progress) / totalPhases : 0;
 
   return {
     phase: currentPhase,

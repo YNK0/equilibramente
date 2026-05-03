@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { ActivePauseExercise } from '../types';
 
 interface Props {
@@ -12,21 +12,34 @@ interface Props {
 export function PauseExercise({ exercise, onComplete, onSkip }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(exercise.duration);
   const [isActive, setIsActive] = useState(true);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    if (!isActive || secondsLeft <= 0) return;
+    setSecondsLeft(exercise.duration);
+    setIsActive(true);
+  }, [exercise]);
+
+  useEffect(() => {
+    if (!isActive) return;
     const timer = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           setIsActive(false);
-          onComplete();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [isActive, secondsLeft, onComplete]);
+  }, [isActive, exercise.duration]);
+
+  useEffect(() => {
+    if (!isActive && secondsLeft === 0) {
+      const timer = setTimeout(() => onCompleteRef.current(), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, secondsLeft]);
 
   const progress = ((exercise.duration - secondsLeft) / exercise.duration) * 100;
 
