@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MOOD_RESPONSES, MOOD_CONFIGS } from '../constants';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { MOOD_CONFIGS, MOOD_RESPONSES } from '../constants';
 import type { MoodLevel } from '../types';
 
 interface Props {
@@ -67,7 +67,6 @@ export function MoodConfirmation({ mood, onDismiss, onSaveNote }: Props) {
                 transition-colors resize-none"
               rows={2}
               maxLength={140}
-              autoFocus
             />
             <div className="flex items-center justify-between mt-1">
               <span className="text-xs text-gray-400">{note.length}/140</span>

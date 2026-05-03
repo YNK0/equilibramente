@@ -26,9 +26,13 @@ export function LoadCard({ level, score }: Props) {
           <div className="w-full h-2 bg-white/60 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
-                level === 'critical' ? 'bg-red-500' :
-                level === 'high' ? 'bg-amber-500' :
-                level === 'moderate' ? 'bg-blue-500' : 'bg-green-500'
+                level === 'critical'
+                  ? 'bg-red-500'
+                  : level === 'high'
+                    ? 'bg-amber-500'
+                    : level === 'moderate'
+                      ? 'bg-blue-500'
+                      : 'bg-green-500'
               }`}
               style={{ width: `${Math.min((score / 20) * 100, 100)}%` }}
             />

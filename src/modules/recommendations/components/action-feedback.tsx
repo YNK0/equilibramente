@@ -1,7 +1,7 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   onFeedback: (wasHelpful: boolean) => void;
@@ -41,10 +41,7 @@ export function ActionFeedback({ onFeedback, onClose }: Props) {
               No mucho
             </button>
           </div>
-          <button
-            onClick={onClose}
-            className="mt-2 text-xs text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="mt-2 text-xs text-gray-400 hover:text-gray-600">
             Cerrar sin votar
           </button>
         </motion.div>

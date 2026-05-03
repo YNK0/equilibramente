@@ -3,16 +3,16 @@
 import { motion } from 'framer-motion';
 
 const LOAD_COLORS: Record<string, string> = {
-  low:      'bg-green-400',
+  low: 'bg-green-400',
   moderate: 'bg-amber-400',
-  high:     'bg-orange-400',
+  high: 'bg-orange-400',
   critical: 'bg-red-500',
 };
 
 const LOAD_LABELS: Record<string, string> = {
-  low:      'Baja',
+  low: 'Baja',
   moderate: 'Moderada',
-  high:     'Alta',
+  high: 'Alta',
   critical: 'Critica',
 };
 
@@ -24,10 +24,7 @@ interface Props {
 
 export function MiniLoadIndicator({ loadLevel, percentage, onClick }: Props) {
   return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-2 w-full"
-    >
+    <button onClick={onClick} className="flex items-center gap-2 w-full">
       <div className="h-2 flex-1 rounded-full bg-gray-100 overflow-hidden">
         <motion.div
           className={`h-full rounded-full ${LOAD_COLORS[loadLevel] || 'bg-gray-400'}`}

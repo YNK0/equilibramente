@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseAudioResult {
   isPlaying: boolean;
@@ -66,7 +66,10 @@ export function useAudio(): UseAudioResult {
       audio.src = url;
       currentUrlRef.current = url;
     }
-    audio.play().then(() => setIsPlaying(true)).catch(() => setError('No se pudo reproducir el audio'));
+    audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setError('No se pudo reproducir el audio'));
   }, []);
 
   const pause = useCallback(() => {
@@ -75,7 +78,10 @@ export function useAudio(): UseAudioResult {
   }, []);
 
   const resume = useCallback(() => {
-    audioRef.current?.play().then(() => setIsPlaying(true)).catch(() => setError('No se pudo reanudar el audio'));
+    audioRef.current
+      ?.play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setError('No se pudo reanudar el audio'));
   }, []);
 
   const stop = useCallback(() => {

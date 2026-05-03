@@ -1,10 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } },
+      { status: 401 }
+    );
 
   const { searchParams } = new URL(req.url);
   const days = Math.min(Number(searchParams.get('days')) || 7, 30);
@@ -19,7 +25,11 @@ export async function GET(req: NextRequest) {
     .lte('created_at', `${to}T23:59:59`)
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ data: null, error: { code: 'SERVER_ERROR', message: error.message } }, { status: 500 });
+  if (error)
+    return NextResponse.json(
+      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+      { status: 500 }
+    );
 
   const checkins = data ?? [];
   const distribution: Record<string, number> = { great: 0, okay: 0, stressed: 0, overwhelmed: 0 };
@@ -35,14 +45,15 @@ export async function GET(req: NextRequest) {
     const mid = Math.ceil(checkins.length / 2);
     const recent = checkins.slice(0, mid);
     const older = checkins.slice(mid);
-    const recentPos = recent.filter(c => ['great', 'okay'].includes(c.mood)).length;
-    const olderPos = older.filter(c => ['great', 'okay'].includes(c.mood)).length;
+    const recentPos = recent.filter((c) => ['great', 'okay'].includes(c.mood)).length;
+    const olderPos = older.filter((c) => ['great', 'okay'].includes(c.mood)).length;
     if (recentPos > olderPos) trend = 'improving';
     else if (recentPos < olderPos) trend = 'declining';
   }
 
   const entries = Object.entries(distribution).filter(([, v]) => v > 0);
-  const mostFrequent = entries.length > 0 ? entries.reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
+  const mostFrequent =
+    entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : null;
 
   return NextResponse.json({
     data: {

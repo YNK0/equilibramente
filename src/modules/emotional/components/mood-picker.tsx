@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import { useCallback, useState } from 'react';
+import { MOOD_CONFIGS } from '../constants';
+import { useCheckin } from '../hooks/use-checkin';
+import type { MoodLevel } from '../types';
 import { MoodCard } from './mood-card';
 import { MoodConfirmation } from './mood-confirmation';
-import { useCheckin } from '../hooks/use-checkin';
-import { MOOD_CONFIGS } from '../constants';
-import type { MoodLevel } from '../types';
 
 interface Props {
   onComplete?: () => void;
@@ -17,16 +17,19 @@ export function MoodPicker({ onComplete }: Props) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { submit, loading, error } = useCheckin();
 
-  const handleSelect = useCallback(async (mood: MoodLevel) => {
-    setSelectedMood(mood);
-    if (navigator.vibrate) navigator.vibrate(50);
-    try {
-      await submit({ mood });
-      setShowConfirmation(true);
-    } catch {
-      setSelectedMood(null);
-    }
-  }, [submit]);
+  const handleSelect = useCallback(
+    async (mood: MoodLevel) => {
+      setSelectedMood(mood);
+      if (navigator.vibrate) navigator.vibrate(50);
+      try {
+        await submit({ mood });
+        setShowConfirmation(true);
+      } catch {
+        setSelectedMood(null);
+      }
+    },
+    [submit]
+  );
 
   const handleDismiss = useCallback(() => {
     setSelectedMood(null);
@@ -54,12 +57,8 @@ export function MoodPicker({ onComplete }: Props) {
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-8">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Como te sientes hoy?
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Toma 5 segundos, sin presion
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Como te sientes hoy?</h1>
+        <p className="text-sm text-gray-500 mt-1">Toma 5 segundos, sin presion</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
@@ -76,10 +75,7 @@ export function MoodPicker({ onComplete }: Props) {
 
       <AnimatePresence>
         {showConfirmation && selectedMood && (
-          <MoodConfirmation
-            mood={selectedMood}
-            onDismiss={handleDismiss}
-          />
+          <MoodConfirmation mood={selectedMood} onDismiss={handleDismiss} />
         )}
       </AnimatePresence>
     </div>

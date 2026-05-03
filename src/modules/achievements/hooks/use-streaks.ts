@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { achievementService } from '../services/achievement-service';
 import type { Streak } from '../types';
 
@@ -9,7 +9,8 @@ export function useStreaks() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    achievementService.getStreaks()
+    achievementService
+      .getStreaks()
       .then(setStreaks)
       .finally(() => setLoading(false));
   }, []);

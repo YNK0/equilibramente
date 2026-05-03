@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { monitoringService } from '../services/monitoring-service';
+import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { TodayData, WeekData, PendingTask } from '../types';
 import type { LoadLevel } from '@/types/database';
+import { monitoringService } from '../services/monitoring-service';
+import type { PendingTask, TodayData, WeekData } from '../types';
 
 interface DashboardState {
   today: TodayData | null;
@@ -46,7 +46,9 @@ export function useDashboard(): DashboardState {
     }
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -54,14 +56,20 @@ export function useDashboard(): DashboardState {
       .channel('dashboard_analysis')
       .on('broadcast', { event: 'analysis_updated' }, (payload) => {
         const p = payload as unknown as AnalysisPayload;
-        setToday((prev) => prev ? {
-          ...prev,
-          load: { level: p.level as LoadLevel, score: p.score },
-        } : prev);
+        setToday((prev) =>
+          prev
+            ? {
+                ...prev,
+                load: { level: p.level as LoadLevel, score: p.score },
+              }
+            : prev
+        );
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { today, week, pendingTasks, loading, needsCheckin, refresh: fetch };

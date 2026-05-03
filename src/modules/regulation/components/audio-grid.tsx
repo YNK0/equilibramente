@@ -1,9 +1,9 @@
 'use client';
 
+import { CloudRain, Mic, Music, Play, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { CloudRain, Sparkles, Music, Mic, Play } from 'lucide-react';
-import { AudioPlayer } from './audio-player';
 import type { AudioResource } from '../types';
+import { AudioPlayer } from './audio-player';
 
 interface Props {
   audios: Array<AudioResource & { audio_url: string | null }>;
@@ -24,12 +24,18 @@ const categoryColors: Record<string, string> = {
 };
 
 export function AudioGrid({ audios }: Props) {
-  const [selected, setSelected] = useState<(AudioResource & { audio_url: string | null }) | null>(null);
+  const [selected, setSelected] = useState<(AudioResource & { audio_url: string | null }) | null>(
+    null
+  );
 
-  if (selected && selected.audio_url) {
+  if (selected?.audio_url) {
     return (
       <div className="p-4">
-        <AudioPlayer audio={selected} audioUrl={selected.audio_url} onStop={() => setSelected(null)} />
+        <AudioPlayer
+          audio={selected}
+          audioUrl={selected.audio_url}
+          onStop={() => setSelected(null)}
+        />
       </div>
     );
   }
@@ -46,7 +52,9 @@ export function AudioGrid({ audios }: Props) {
           onClick={() => setSelected(audio)}
           className="flex flex-col items-center gap-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow text-left"
         >
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${categoryColors[audio.category] || 'bg-gray-100 text-gray-600'}`}>
+          <div
+            className={`w-12 h-12 rounded-full flex items-center justify-center ${categoryColors[audio.category] || 'bg-gray-100 text-gray-600'}`}
+          >
             {categoryIcons[audio.category] || <Music className="w-6 h-6" />}
           </div>
           <div className="text-center">

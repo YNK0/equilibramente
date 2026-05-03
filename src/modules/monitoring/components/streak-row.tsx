@@ -8,7 +8,10 @@ interface Props {
 
 export function StreakRow({ current, longest, weekDays }: Props) {
   const dayLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-  const padded = weekDays.length >= 7 ? weekDays.slice(-7) : [...Array(7 - weekDays.length).fill(false), ...weekDays];
+  const padded =
+    weekDays.length >= 7
+      ? weekDays.slice(-7)
+      : [...Array(7 - weekDays.length).fill(false), ...weekDays];
 
   return (
     <div className="p-4 bg-white rounded-xl border border-gray-100">
@@ -34,9 +37,7 @@ export function StreakRow({ current, longest, weekDays }: Props) {
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-gray-400 mt-2">
-        Mejor racha: {longest} días
-      </p>
+      <p className="text-[10px] text-gray-400 mt-2">Mejor racha: {longest} días</p>
     </div>
   );
 }

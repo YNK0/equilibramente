@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { calculateLoad, getLoadLevel, computeTrend } from '../utils/load-calculator';
+import { describe, expect, it } from 'vitest';
+import { calculateLoad, computeTrend, getLoadLevel } from '../utils/load-calculator';
 
 const mkTasks = (
   tasks: { difficulty: 'low' | 'medium' | 'high'; status?: string; due_date?: string | null }[]
@@ -37,7 +37,11 @@ describe('calculateLoad', () => {
 
   it('returns moderate with 3 medium tasks and okay mood', () => {
     const r = calculateLoad({
-      tasks: mkTasks([{ difficulty: 'medium' }, { difficulty: 'medium' }, { difficulty: 'medium' }]),
+      tasks: mkTasks([
+        { difficulty: 'medium' },
+        { difficulty: 'medium' },
+        { difficulty: 'medium' },
+      ]),
       lastCheckin: { mood: 'okay' },
     });
     expect(r.level).toBe('moderate');

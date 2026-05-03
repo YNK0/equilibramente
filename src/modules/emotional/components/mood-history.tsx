@@ -1,9 +1,9 @@
 'use client';
 
-import { useMoodStats } from '../hooks/use-mood-stats';
-import { MOOD_CONFIGS } from '../constants';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
 import { EmptyState } from '@/modules/shared/components/ui/empty-state';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
+import { MOOD_CONFIGS } from '../constants';
+import { useMoodStats } from '../hooks/use-mood-stats';
 
 export function MoodHistory() {
   const { stats, loading } = useMoodStats(7);

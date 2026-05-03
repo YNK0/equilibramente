@@ -1,10 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } },
+      { status: 401 }
+    );
 
   const { searchParams } = new URL(req.url);
   const days = Math.min(Number(searchParams.get('days')) || 30, 90);
@@ -17,7 +23,11 @@ export async function GET(req: NextRequest) {
     .gte('created_at', since)
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ data: null, error: { code: 'SERVER_ERROR', message: error.message } }, { status: 500 });
+  if (error)
+    return NextResponse.json(
+      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+      { status: 500 }
+    );
 
   const sessions = data ?? [];
   let totalSeconds = 0;
@@ -30,7 +40,10 @@ export async function GET(req: NextRequest) {
   let mostUsedType = 'breathing';
   let maxCount = 0;
   for (const [t, c] of Object.entries(typeCount)) {
-    if (c > maxCount) { maxCount = c; mostUsedType = t; }
+    if (c > maxCount) {
+      maxCount = c;
+      mostUsedType = t;
+    }
   }
 
   return NextResponse.json({

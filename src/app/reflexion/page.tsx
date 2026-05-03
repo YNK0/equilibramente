@@ -1,24 +1,27 @@
 'use client';
 
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import Link from 'next/link';
 import { ReflectionForm } from '@/modules/reflection/components/reflection-form';
 import { useReflection } from '@/modules/reflection/hooks/use-reflection';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
-import Link from 'next/link';
 
 export default function ReflexionPage() {
   const { hasTodayReflection, loading } = useReflection();
 
-  if (loading) return <AppShell title="Reflexión"><PageLoading /></AppShell>;
+  if (loading)
+    return (
+      <AppShell title="Reflexión">
+        <PageLoading />
+      </AppShell>
+    );
 
   return (
     <AppShell title="Reflexión">
       {hasTodayReflection ? (
         <div className="flex flex-col items-center gap-4 p-8 text-center">
           <span className="text-5xl">🌱</span>
-          <h3 className="text-xl font-semibold text-gray-900">
-            Ya reflexionaste hoy
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900">Ya reflexionaste hoy</h3>
           <p className="text-sm text-gray-500">
             Cada reflexión te ayuda a conocerte mejor. Vuelve mañana.
           </p>

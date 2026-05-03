@@ -1,16 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } },
+      { status: 401 }
+    );
 
   const body = await req.json();
   const { type, mood_before } = body;
 
   if (!type || !['breathing', 'audio', 'active_pause'].includes(type)) {
-    return NextResponse.json({ data: null, error: { code: 'INVALID_TYPE', message: 'Tipo de regulación inválido' } }, { status: 400 });
+    return NextResponse.json(
+      { data: null, error: { code: 'INVALID_TYPE', message: 'Tipo de regulación inválido' } },
+      { status: 400 }
+    );
   }
 
   const { data, error } = await supabase
@@ -19,6 +28,10 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ data: null, error: { code: 'SERVER_ERROR', message: error.message } }, { status: 500 });
+  if (error)
+    return NextResponse.json(
+      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+      { status: 500 }
+    );
   return NextResponse.json({ data, error: null }, { status: 201 });
 }

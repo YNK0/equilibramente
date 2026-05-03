@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BREATHING_PATTERNS } from '../constants';
 import type { BreathingPatternKey, BreathingPhase } from '../types';
 
@@ -40,43 +40,46 @@ export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResul
 
   const currentPhase = pattern.phases[phaseIndex];
 
-  const animate = useCallback((timestamp: number) => {
-    if (!phaseStartRef.current) phaseStartRef.current = timestamp;
-    if (!exerciseStartRef.current) exerciseStartRef.current = timestamp;
+  const animate = useCallback(
+    (timestamp: number) => {
+      if (!phaseStartRef.current) phaseStartRef.current = timestamp;
+      if (!exerciseStartRef.current) exerciseStartRef.current = timestamp;
 
-    const phaseElapsed = (timestamp - phaseStartRef.current) / 1000;
-    const currentDuration = pattern.phases[phaseIndexRef.current]?.duration ?? 1;
-    const phaseProgress = Math.min(phaseElapsed / currentDuration, 1);
+      const phaseElapsed = (timestamp - phaseStartRef.current) / 1000;
+      const currentDuration = pattern.phases[phaseIndexRef.current]?.duration ?? 1;
+      const phaseProgress = Math.min(phaseElapsed / currentDuration, 1);
 
-    setProgress(phaseProgress);
-    setElapsedSeconds((timestamp - exerciseStartRef.current) / 1000);
+      setProgress(phaseProgress);
+      setElapsedSeconds((timestamp - exerciseStartRef.current) / 1000);
 
-    if (phaseProgress >= 1) {
-      phaseStartRef.current = timestamp;
-      const nextIdx = phaseIndexRef.current + 1;
+      if (phaseProgress >= 1) {
+        phaseStartRef.current = timestamp;
+        const nextIdx = phaseIndexRef.current + 1;
 
-      if (nextIdx >= pattern.phases.length) {
-        const nextCycle = cycleRef.current + 1;
-        if (nextCycle > pattern.cycles) {
-          activeRef.current = false;
-          setIsActive(false);
-          setIsCompleted(true);
-          return;
+        if (nextIdx >= pattern.phases.length) {
+          const nextCycle = cycleRef.current + 1;
+          if (nextCycle > pattern.cycles) {
+            activeRef.current = false;
+            setIsActive(false);
+            setIsCompleted(true);
+            return;
+          }
+          cycleRef.current = nextCycle;
+          phaseIndexRef.current = 0;
+          setCycle(nextCycle);
+          setPhaseIndex(0);
+        } else {
+          phaseIndexRef.current = nextIdx;
+          setPhaseIndex(nextIdx);
         }
-        cycleRef.current = nextCycle;
-        phaseIndexRef.current = 0;
-        setCycle(nextCycle);
-        setPhaseIndex(0);
-      } else {
-        phaseIndexRef.current = nextIdx;
-        setPhaseIndex(nextIdx);
       }
-    }
 
-    if (activeRef.current) {
-      animFrameRef.current = requestAnimationFrame(animate);
-    }
-  }, [pattern]);
+      if (activeRef.current) {
+        animFrameRef.current = requestAnimationFrame(animate);
+      }
+    },
+    [pattern]
+  );
 
   const start = useCallback(() => {
     activeRef.current = true;
@@ -105,7 +108,7 @@ export function useBreathing(patternKey: BreathingPatternKey): UseBreathingResul
     activeRef.current = true;
     setIsActive(true);
     setIsPaused(false);
-    phaseStartRef.current = performance.now() - (progress * currentPhase.duration * 1000);
+    phaseStartRef.current = performance.now() - progress * currentPhase.duration * 1000;
     animFrameRef.current = requestAnimationFrame(animate);
   }, [animate, progress, currentPhase.duration]);
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { useEffect, useState } from 'react';
 import { AudioGrid } from '@/modules/regulation/components/audio-grid';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
 import type { AudioResource } from '@/modules/regulation/types';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
 
 export default function AudiosPage() {
   const [audios, setAudios] = useState<(AudioResource & { audio_url: string | null })[]>([]);

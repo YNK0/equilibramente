@@ -1,24 +1,45 @@
 import type { Difficulty, DifficultyConfig, TaskStatus } from './types';
 
 export const DIFFICULTY_CONFIGS: Record<Difficulty, DifficultyConfig> = {
-  low:    { value: 'low',    label: 'Baja',  bgColor: 'bg-green-50',  textColor: 'text-green-700',  borderColor: 'border-green-200',  weight: 1 },
-  medium: { value: 'medium', label: 'Media', bgColor: 'bg-amber-50',  textColor: 'text-amber-700',  borderColor: 'border-amber-200',  weight: 2 },
-  high:   { value: 'high',   label: 'Alta',  bgColor: 'bg-red-50',    textColor: 'text-red-700',    borderColor: 'border-red-200',    weight: 3 },
+  low: {
+    value: 'low',
+    label: 'Baja',
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+    borderColor: 'border-green-200',
+    weight: 1,
+  },
+  medium: {
+    value: 'medium',
+    label: 'Media',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    borderColor: 'border-amber-200',
+    weight: 2,
+  },
+  high: {
+    value: 'high',
+    label: 'Alta',
+    bgColor: 'bg-red-50',
+    textColor: 'text-red-700',
+    borderColor: 'border-red-200',
+    weight: 3,
+  },
 };
 
 export const URGENCY_COLORS = {
-  today:     { border: 'border-red-400',    text: 'text-red-600',    badge: 'Hoy' },
-  tomorrow:  { border: 'border-orange-400', text: 'text-orange-600', badge: 'Manana' },
-  this_week: { border: 'border-amber-400',  text: 'text-amber-600',  badge: null },
-  later:     { border: 'border-gray-200',   text: 'text-gray-400',   badge: null },
-  none:      { border: 'border-gray-200',   text: 'text-gray-400',   badge: null },
+  today: { border: 'border-red-400', text: 'text-red-600', badge: 'Hoy' },
+  tomorrow: { border: 'border-orange-400', text: 'text-orange-600', badge: 'Manana' },
+  this_week: { border: 'border-amber-400', text: 'text-amber-600', badge: null },
+  later: { border: 'border-gray-200', text: 'text-gray-400', badge: null },
+  none: { border: 'border-gray-200', text: 'text-gray-400', badge: null },
 } as const;
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
-  pending:     'Pendientes',
+  pending: 'Pendientes',
   in_progress: 'En progreso',
-  completed:   'Completadas',
-  cancelled:   'Canceladas',
+  completed: 'Completadas',
+  cancelled: 'Canceladas',
 };
 
 export const ESTIMATED_TIME_OPTIONS = [15, 30, 60, 120, 180, 240];

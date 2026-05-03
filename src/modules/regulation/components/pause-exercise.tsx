@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ActivePauseExercise } from '../types';
 
 interface Props {
@@ -32,7 +32,7 @@ export function PauseExercise({ exercise, onComplete, onSkip }: Props) {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [isActive, exercise.duration]);
+  }, [isActive]);
 
   useEffect(() => {
     if (!isActive && secondsLeft === 0) {
@@ -54,9 +54,15 @@ export function PauseExercise({ exercise, onComplete, onSkip }: Props) {
         {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}
       </div>
       <div className="w-full max-w-xs bg-gray-100 rounded-full h-2">
-        <div className="h-2 rounded-full bg-purple-500 transition-all duration-1000 ease-linear" style={{ width: `${progress}%` }} />
+        <div
+          className="h-2 rounded-full bg-purple-500 transition-all duration-1000 ease-linear"
+          style={{ width: `${progress}%` }}
+        />
       </div>
-      <button onClick={onSkip} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+      <button
+        onClick={onSkip}
+        className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+      >
         Saltar
       </button>
     </div>

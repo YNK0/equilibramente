@@ -1,8 +1,7 @@
 'use client';
 
-import { emotionalService } from '../services/emotional-service';
 import { MOOD_CONFIGS } from '../constants';
-import type { EmotionalCheckin, MoodLevel } from '../types';
+import type { EmotionalCheckin } from '../types';
 
 interface Props {
   checkin: EmotionalCheckin;
@@ -11,9 +10,7 @@ interface Props {
 
 export function MoodStateBanner({ checkin, onChange }: Props) {
   const mood = MOOD_CONFIGS[checkin.mood as keyof typeof MOOD_CONFIGS];
-  const hoursAgo = Math.round(
-    (Date.now() - new Date(checkin.created_at).getTime()) / 3600000
-  );
+  const hoursAgo = Math.round((Date.now() - new Date(checkin.created_at).getTime()) / 3600000);
 
   return (
     <div className="flex flex-col items-center gap-3 px-4 py-6 text-center">
@@ -23,7 +20,9 @@ export function MoodStateBanner({ checkin, onChange }: Props) {
           Hoy te sientes: {mood?.label ?? checkin.mood}
         </p>
         <p className="text-sm text-gray-400 mt-1">
-          {hoursAgo <= 0 ? 'Hace un momento' : `Hace ${hoursAgo} ${hoursAgo === 1 ? 'hora' : 'horas'}`}
+          {hoursAgo <= 0
+            ? 'Hace un momento'
+            : `Hace ${hoursAgo} ${hoursAgo === 1 ? 'hora' : 'horas'}`}
         </p>
       </div>
       <button

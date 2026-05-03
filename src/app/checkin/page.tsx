@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { useEffect, useState } from 'react';
+import { triggerAnalysisRefresh } from '@/modules/analysis/services/analysis-trigger';
 import { MoodPicker } from '@/modules/emotional/components/mood-picker';
 import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
 import { OnboardingFlow } from '@/modules/emotional/components/onboarding-flow';
 import { emotionalService } from '@/modules/emotional/services/emotional-service';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
-import { triggerAnalysisRefresh } from '@/modules/analysis/services/analysis-trigger';
 import type { EmotionalCheckin } from '@/modules/emotional/types';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
 
 export default function CheckinPage() {
   const router = useRouter();
@@ -47,7 +47,12 @@ export default function CheckinPage() {
     setTodayCheckin(null);
   };
 
-  if (loading) return <AppShell title="Check-in"><PageLoading /></AppShell>;
+  if (loading)
+    return (
+      <AppShell title="Check-in">
+        <PageLoading />
+      </AppShell>
+    );
 
   if (showOnboarding) {
     return (
@@ -59,9 +64,7 @@ export default function CheckinPage() {
 
   return (
     <AppShell title="Check-in">
-      {todayCheckin ? (
-        <MoodStateBanner checkin={todayCheckin} onChange={handleChange} />
-      ) : null}
+      {todayCheckin ? <MoodStateBanner checkin={todayCheckin} onChange={handleChange} /> : null}
       {!todayCheckin && <MoodPicker onComplete={handleCheckinComplete} />}
     </AppShell>
   );

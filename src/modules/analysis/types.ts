@@ -1,5 +1,4 @@
 import type { Database } from '@/types/database';
-import type { MoodLevel } from '@/modules/emotional/types';
 
 export type LoadLevel = 'low' | 'moderate' | 'high' | 'critical';
 export type LoadTrend = 'improving' | 'stable' | 'worsening';

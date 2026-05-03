@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { EmotionalCheckin, CheckinCreateInput, MoodStats, MoodLevel } from '../types';
+import type { CheckinCreateInput, EmotionalCheckin, MoodLevel, MoodStats } from '../types';
 
 const supabase = createClient();
 
@@ -72,7 +72,12 @@ export const emotionalService = {
     if (error) throw error;
 
     const checkins = data ?? [];
-    const distribution: Record<MoodLevel, number> = { great: 0, okay: 0, stressed: 0, overwhelmed: 0 };
+    const distribution: Record<MoodLevel, number> = {
+      great: 0,
+      okay: 0,
+      stressed: 0,
+      overwhelmed: 0,
+    };
     let totalIntensity = 0;
 
     for (const c of checkins) {
@@ -80,15 +85,15 @@ export const emotionalService = {
       if (c.intensity) totalIntensity += c.intensity;
     }
 
-    const moods = checkins.map(c => c.mood as MoodLevel);
+    const moods = checkins.map((c) => c.mood as MoodLevel);
     let trend: MoodStats['mood_trend'] = 'stable';
     if (checkins.length >= 3) {
-      const positive = moods.filter(m => m === 'great' || m === 'okay').length;
-      const negative = moods.filter(m => m === 'stressed' || m === 'overwhelmed').length;
+      const _positive = moods.filter((m) => m === 'great' || m === 'okay').length;
+      const _negative = moods.filter((m) => m === 'stressed' || m === 'overwhelmed').length;
       const recent = checkins.slice(0, Math.ceil(checkins.length / 2));
       const older = checkins.slice(Math.ceil(checkins.length / 2));
-      const recentPositive = recent.filter(m => ['great', 'okay'].includes(m.mood)).length;
-      const olderPositive = older.filter(m => ['great', 'okay'].includes(m.mood)).length;
+      const recentPositive = recent.filter((m) => ['great', 'okay'].includes(m.mood)).length;
+      const olderPositive = older.filter((m) => ['great', 'okay'].includes(m.mood)).length;
       if (recentPositive > olderPositive) trend = 'improving';
       else if (recentPositive < olderPositive) trend = 'declining';
     }

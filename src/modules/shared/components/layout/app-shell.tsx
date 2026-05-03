@@ -1,9 +1,9 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { ErrorBoundary } from '@/modules/shared/components/ui/error-boundary';
 import { BottomNav } from './bottom-nav';
 import { TopBar } from './top-bar';
-import { ErrorBoundary } from '@/modules/shared/components/ui/error-boundary';
 
 interface Props {
   children: ReactNode;
@@ -16,9 +16,7 @@ export function AppShell({ children, title, showNav = true }: Props) {
     <div className="min-h-screen bg-purple-50/30">
       {title && <TopBar title={title} />}
       <main className={`max-w-lg mx-auto ${showNav ? 'pb-20' : ''}`}>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
       {showNav && <BottomNav />}
     </div>

@@ -1,5 +1,5 @@
-import type { Database } from '@/types/database';
 import type { LoadLevel } from '@/modules/analysis/types';
+import type { Database } from '@/types/database';
 
 export type Recommendation = Database['public']['Tables']['recommendations']['Row'];
 export type RecommendationLog = Database['public']['Tables']['recommendation_logs']['Row'];

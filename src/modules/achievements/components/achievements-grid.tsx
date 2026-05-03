@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { CATEGORY_LABELS } from '../constants';
+import { useAchievements } from '../hooks/use-achievements';
 import { AchievementBadge } from './achievement-badge';
 import { ProgressRing } from './progress-ring';
-import { useAchievements } from '../hooks/use-achievements';
-import { CATEGORY_LABELS } from '../constants';
 
 export function AchievementsGrid() {
   const { achievements, summary, loading } = useAchievements();

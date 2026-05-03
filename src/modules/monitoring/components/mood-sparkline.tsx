@@ -1,7 +1,7 @@
 'use client';
 
-import { MOOD_TO_NUMBER } from '../constants';
 import type { MoodLevel } from '@/modules/emotional/types';
+import { MOOD_TO_NUMBER } from '../constants';
 
 interface Props {
   days: Array<{ date: string; mood: MoodLevel | null }>;
@@ -20,11 +20,13 @@ export function MoodSparkline({ days, trend }: Props) {
   const maxH = 40;
   const minVal = 1;
   const maxVal = 5;
-  const points = data.map((v, i) => {
-    const x = data.length > 1 ? (i / (data.length - 1)) * 100 : 50;
-    const y = maxH - ((v - minVal) / (maxVal - minVal)) * maxH;
-    return `${x},${y}`;
-  }).join(' ');
+  const points = data
+    .map((v, i) => {
+      const x = data.length > 1 ? (i / (data.length - 1)) * 100 : 50;
+      const y = maxH - ((v - minVal) / (maxVal - minVal)) * maxH;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <div className="p-4 bg-white rounded-xl border border-gray-100">

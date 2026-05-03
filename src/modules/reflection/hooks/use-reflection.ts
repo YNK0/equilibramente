@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { reflectionService } from '../services/reflection-service';
 import type { DailyReflection, ReflectionInput } from '../types';
 
@@ -10,7 +10,8 @@ export function useReflection() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    reflectionService.getToday()
+    reflectionService
+      .getToday()
       .then(setTodayReflection)
       .finally(() => setLoading(false));
   }, []);

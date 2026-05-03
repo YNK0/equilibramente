@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
-import { PauseExercise } from './pause-exercise';
-import { MoodComparison } from './mood-comparison';
-import { regulationService } from '../services/regulation-service';
+import { useCallback, useRef, useState } from 'react';
 import { ACTIVE_PAUSE_SEQUENCE } from '../constants';
+import { regulationService } from '../services/regulation-service';
+import { MoodComparison } from './mood-comparison';
+import { PauseExercise } from './pause-exercise';
 
 export function ActivePause() {
   const [step, setStep] = useState(0);
@@ -19,11 +19,14 @@ export function ActivePause() {
     startTimeRef.current = Date.now();
     setStarted(true);
     // Fire-and-forget: don't block exercise start on DB
-    regulationService.startSession('active_pause').then((s) => {
-      sessionIdRef.current = s.id;
-    }).catch(() => {
-      // Session continues locally even if DB fails
-    });
+    regulationService
+      .startSession('active_pause')
+      .then((s) => {
+        sessionIdRef.current = s.id;
+      })
+      .catch(() => {
+        // Session continues locally even if DB fails
+      });
   }, []);
 
   const handleExerciseComplete = useCallback(() => {

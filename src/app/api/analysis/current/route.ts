@@ -24,9 +24,7 @@ export async function GET() {
       .limit(1);
 
     const latest = analyses?.[0] ?? null;
-    const isStale =
-      !latest ||
-      Date.now() - new Date(latest.created_at).getTime() > STALE_MS;
+    const isStale = !latest || Date.now() - new Date(latest.created_at).getTime() > STALE_MS;
 
     if (!isStale) {
       // Return cached analysis with its recommendations
@@ -90,10 +88,29 @@ export async function GET() {
     const matched = (allRecs ?? [])
       .filter((rec) => {
         const trigger = rec.trigger_condition as Record<string, unknown>;
-        if (trigger.load_level && Array.isArray(trigger.load_level) && !(trigger.load_level as string[]).includes(result.level)) return false;
-        if (typeof trigger.min_difficulty_tasks === 'number' && result.highDifficultyCount < (trigger.min_difficulty_tasks as number)) return false;
-        if (trigger.mood_in && Array.isArray(trigger.mood_in) && (!checkins?.[0]?.mood || !(trigger.mood_in as string[]).includes(checkins[0].mood))) return false;
-        if (trigger.time_of_day && Array.isArray(trigger.time_of_day) && !(trigger.time_of_day as string[]).includes(period)) return false;
+        if (
+          trigger.load_level &&
+          Array.isArray(trigger.load_level) &&
+          !(trigger.load_level as string[]).includes(result.level)
+        )
+          return false;
+        if (
+          typeof trigger.min_difficulty_tasks === 'number' &&
+          result.highDifficultyCount < (trigger.min_difficulty_tasks as number)
+        )
+          return false;
+        if (
+          trigger.mood_in &&
+          Array.isArray(trigger.mood_in) &&
+          (!checkins?.[0]?.mood || !(trigger.mood_in as string[]).includes(checkins[0].mood))
+        )
+          return false;
+        if (
+          trigger.time_of_day &&
+          Array.isArray(trigger.time_of_day) &&
+          !(trigger.time_of_day as string[]).includes(period)
+        )
+          return false;
         return true;
       })
       .sort((a, b) => b.priority - a.priority)

@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Pause, Square } from 'lucide-react';
+import { Pause, Play, Square } from 'lucide-react';
 import { useAudio } from '../hooks/use-audio';
 import type { AudioResource } from '../types';
 
@@ -11,11 +11,18 @@ interface Props {
 }
 
 export function AudioPlayer({ audio, audioUrl, onStop }: Props) {
-  const { isPlaying, isLoading, currentTime, duration, error, play, pause, resume, stop } = useAudio();
+  const { isPlaying, isLoading, currentTime, duration, error, play, pause, resume, stop } =
+    useAudio();
 
   const handleToggle = () => {
     if (isLoading) return;
-    if (isPlaying) { pause(); } else if (currentTime > 0) { resume(); } else { play(audioUrl); }
+    if (isPlaying) {
+      pause();
+    } else if (currentTime > 0) {
+      resume();
+    } else {
+      play(audioUrl);
+    }
   };
 
   const handleStop = () => {
@@ -49,13 +56,21 @@ export function AudioPlayer({ audio, audioUrl, onStop }: Props) {
 
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-800 truncate">{audio.title}</p>
-          <p className="text-xs text-gray-400">{isPlaying ? formatTime(currentTime) : formatTime(duration)} · {audio.category}</p>
+          <p className="text-xs text-gray-400">
+            {isPlaying ? formatTime(currentTime) : formatTime(duration)} · {audio.category}
+          </p>
           <div className="mt-1 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-purple-500 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div
+              className="h-full bg-purple-500 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
 
-        <button onClick={handleStop} className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+        <button
+          onClick={handleStop}
+          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
           <Square className="w-4 h-4" />
         </button>
       </div>

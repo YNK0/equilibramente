@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { monitoringService } from '../services/monitoring-service';
 import type { WeekData } from '../types';
 
@@ -23,7 +23,7 @@ export function useWeeklyReport(): WeeklyReportState {
         monitoringService.getWeek(),
         monitoringService.getRange(
           new Date(Date.now() - 13 * 86400000).toISOString().split('T')[0],
-          new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0],
+          new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
         ),
       ]);
       setWeek(current);
@@ -35,7 +35,9 @@ export function useWeeklyReport(): WeeklyReportState {
     }
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   return { week, prevWeekDays, loading, refresh: fetch };
 }

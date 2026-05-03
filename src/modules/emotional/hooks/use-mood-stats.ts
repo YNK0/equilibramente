@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { emotionalService } from '../services/emotional-service';
 import type { MoodStats } from '../types';
 
@@ -18,7 +18,9 @@ export function useMoodStats(days = 7) {
     }
   }, [days]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   return { stats, loading, refetch: fetch };
 }

@@ -33,7 +33,9 @@ export function QuestionPrompt({
       className="flex flex-col gap-4 p-4"
     >
       <div className="flex items-center justify-between text-xs text-gray-400">
-        <span>Pregunta {step} de {total}</span>
+        <span>
+          Pregunta {step} de {total}
+        </span>
         <button onClick={onSkip} className="text-purple-600 font-medium">
           Saltar
         </button>
@@ -49,7 +51,6 @@ export function QuestionPrompt({
         placeholder={placeholder}
         rows={4}
         className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm placeholder:text-gray-300 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-colors resize-none"
-        autoFocus
       />
 
       <div className="flex items-center justify-between">

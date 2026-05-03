@@ -1,9 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import type { LoadAnalysis } from '../types';
-import { LOAD_LEVEL_CONFIGS } from '../constants';
 
 interface Props {
   data: LoadAnalysis[];
@@ -34,13 +42,11 @@ export function LoadHistoryChart({ data, loading }: Props) {
     );
   }
 
-  const chartData = [...data]
-    .reverse()
-    .map((a) => ({
-      date: new Date(a.created_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' }),
-      score: a.load_score,
-      level: a.load_level,
-    }));
+  const chartData = [...data].reverse().map((a) => ({
+    date: new Date(a.created_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' }),
+    score: a.load_score,
+    level: a.load_level,
+  }));
 
   return (
     <div>

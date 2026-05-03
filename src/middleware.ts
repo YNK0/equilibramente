@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
 
 export async function middleware(req: NextRequest) {
@@ -22,11 +22,13 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // Public routes
   const publicPaths = ['/auth'];
-  const isPublic = publicPaths.some(p => req.nextUrl.pathname.startsWith(p));
+  const isPublic = publicPaths.some((p) => req.nextUrl.pathname.startsWith(p));
   if (isPublic) return res;
 
   // API routes handle auth themselves
@@ -43,7 +45,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sw.js|icons/|illustrations/).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|sw.js|icons/|illustrations/).*)'],
 };

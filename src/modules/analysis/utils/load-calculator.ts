@@ -1,5 +1,5 @@
-import type { LoadInput, LoadResult, LoadLevel } from '../types';
 import { WEIGHTS } from '../constants';
+import type { LoadInput, LoadLevel, LoadResult } from '../types';
 
 export function calculateLoad(input: LoadInput): LoadResult {
   const pendingTasks = input.tasks.filter(
@@ -77,8 +77,7 @@ export function computeTrend(
 ): 'improving' | 'stable' | 'worsening' {
   if (previousScores.length === 0) return 'stable';
 
-  const avg =
-    previousScores.reduce((sum, s) => sum + s, 0) / previousScores.length;
+  const avg = previousScores.reduce((sum, s) => sum + s, 0) / previousScores.length;
   const ratio = currentScore / avg;
 
   if (ratio > 1.5) return 'worsening';

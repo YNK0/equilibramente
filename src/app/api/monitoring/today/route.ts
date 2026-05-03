@@ -3,8 +3,14 @@ import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET() {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } },
+      { status: 401 }
+    );
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -17,10 +23,7 @@ export async function GET() {
     .limit(1)
     .maybeSingle();
 
-  const { data: tasks } = await supabase
-    .from('tasks')
-    .select('status')
-    .eq('user_id', user.id);
+  const { data: tasks } = await supabase.from('tasks').select('status').eq('user_id', user.id);
 
   const allTasks = tasks ?? [];
 
@@ -57,8 +60,15 @@ export async function GET() {
         pending: allTasks.filter((t) => t.status !== 'completed').length,
       },
       load: { level: load?.load_level ?? null, score: load?.load_score ?? null },
-      regulation: { sessions: reg.length, total_seconds: reg.reduce((sum, s) => sum + (s.duration_seconds ?? 0), 0) },
-      streak: { type: 'checkin', current: streak?.current_count ?? 0, longest: streak?.longest_count ?? 0 },
+      regulation: {
+        sessions: reg.length,
+        total_seconds: reg.reduce((sum, s) => sum + (s.duration_seconds ?? 0), 0),
+      },
+      streak: {
+        type: 'checkin',
+        current: streak?.current_count ?? 0,
+        longest: streak?.longest_count ?? 0,
+      },
     },
     error: null,
   });

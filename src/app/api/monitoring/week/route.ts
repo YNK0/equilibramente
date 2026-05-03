@@ -3,8 +3,14 @@ import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET() {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } },
+      { status: 401 }
+    );
 
   const today = new Date();
   const dayOfWeek = today.getDay();
@@ -52,7 +58,9 @@ export async function GET() {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     const dateStr = d.toISOString().split('T')[0];
-    const tasksCompleted = tasks?.filter((t) => t.status === 'completed' && t.completed_at?.startsWith(dateStr)).length ?? 0;
+    const tasksCompleted =
+      tasks?.filter((t) => t.status === 'completed' && t.completed_at?.startsWith(dateStr))
+        .length ?? 0;
     days.push({
       date: dateStr,
       mood: checkinMap.get(dateStr) ?? null,
@@ -64,7 +72,8 @@ export async function GET() {
 
   const moods = days.filter((d) => d.mood).map((d) => d.mood!);
   const moodValues = { great: 5, okay: 3.5, stressed: 2, overwhelmed: 1 } as Record<string, number>;
-  const avgMood = moods.length > 0 ? moods.reduce((sum, m) => sum + (moodValues[m] || 0), 0) / moods.length : 0;
+  const avgMood =
+    moods.length > 0 ? moods.reduce((sum, m) => sum + (moodValues[m] || 0), 0) / moods.length : 0;
 
   const { data: streaks } = await supabase
     .from('streaks')
@@ -79,9 +88,22 @@ export async function GET() {
   // Compute trend
   const firstHalf = moods.slice(0, Math.ceil(moods.length / 2));
   const secondHalf = moods.slice(Math.ceil(moods.length / 2));
-  const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / firstHalf.length : 0;
-  const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / secondHalf.length : 0;
-  const trend = moods.length < 2 ? 'stable' : secondAvg > firstAvg ? 'improving' : secondAvg < firstAvg ? 'worsening' : 'stable';
+  const firstAvg =
+    firstHalf.length > 0
+      ? firstHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / firstHalf.length
+      : 0;
+  const secondAvg =
+    secondHalf.length > 0
+      ? secondHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / secondHalf.length
+      : 0;
+  const trend =
+    moods.length < 2
+      ? 'stable'
+      : secondAvg > firstAvg
+        ? 'improving'
+        : secondAvg < firstAvg
+          ? 'worsening'
+          : 'stable';
 
   return NextResponse.json({
     data: {

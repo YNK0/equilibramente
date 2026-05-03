@@ -1,10 +1,7 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createServerSupabase();
 
@@ -35,15 +32,13 @@ export async function POST(
         .eq('id', existing.id);
       if (error) throw error;
     } else {
-      const { error } = await supabase
-        .from('recommendation_logs')
-        .insert({
-          user_id: user.id,
-          recommendation_id: id,
-          load_analysis_id: load_analysis_id ?? null,
-          action_taken: action_taken ?? null,
-          was_helpful: was_helpful ?? null,
-        });
+      const { error } = await supabase.from('recommendation_logs').insert({
+        user_id: user.id,
+        recommendation_id: id,
+        load_analysis_id: load_analysis_id ?? null,
+        action_taken: action_taken ?? null,
+        was_helpful: was_helpful ?? null,
+      });
       if (error) throw error;
     }
 

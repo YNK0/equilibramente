@@ -3,8 +3,14 @@ import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET() {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesión para continuar' } },
+      { status: 401 }
+    );
 
   const [{ data: allAchievements }, { data: userUnlocked }] = await Promise.all([
     supabase.from('achievements').select('*').order('tier', { ascending: true }),

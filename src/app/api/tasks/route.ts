@@ -1,10 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } },
+      { status: 401 }
+    );
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get('status') || 'pending';
@@ -24,28 +30,53 @@ export async function GET(req: NextRequest) {
   if (difficulty) query = query.eq('difficulty', difficulty);
 
   const { data, count, error } = await query;
-  if (error) return NextResponse.json({ data: null, error: { code: 'SERVER_ERROR', message: error.message } }, { status: 500 });
+  if (error)
+    return NextResponse.json(
+      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+      { status: 500 }
+    );
 
-  return NextResponse.json({ data: data ?? [], count: count ?? 0, page: Math.floor(offset / limit) + 1, page_size: limit, error: null });
+  return NextResponse.json({
+    data: data ?? [],
+    count: count ?? 0,
+    page: Math.floor(offset / limit) + 1,
+    page_size: limit,
+    error: null,
+  });
 }
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json(
+      { data: null, error: { code: 'AUTH_REQUIRED', message: 'Inicia sesion para continuar' } },
+      { status: 401 }
+    );
 
   const body = await req.json();
   const { title, description, difficulty, due_date, estimated_minutes } = body;
 
   const errors: Record<string, string> = {};
-  if (!title || !title.trim()) errors.title = 'Escribe un titulo para la tarea';
+  if (!title?.trim()) errors.title = 'Escribe un titulo para la tarea';
   else if (title.length > 200) errors.title = 'El titulo debe tener maximo 200 caracteres';
-  if (!difficulty || !['low', 'medium', 'high'].includes(difficulty)) errors.difficulty = 'Selecciona la dificultad';
-  if (description && description.length > 500) errors.description = 'La descripcion debe tener maximo 500 caracteres';
-  if (estimated_minutes && estimated_minutes < 5) errors.estimated_minutes = 'El tiempo minimo es 5 minutos';
+  if (!difficulty || !['low', 'medium', 'high'].includes(difficulty))
+    errors.difficulty = 'Selecciona la dificultad';
+  if (description && description.length > 500)
+    errors.description = 'La descripcion debe tener maximo 500 caracteres';
+  if (estimated_minutes && estimated_minutes < 5)
+    errors.estimated_minutes = 'El tiempo minimo es 5 minutos';
 
   if (Object.keys(errors).length > 0) {
-    return NextResponse.json({ data: null, error: { code: 'VALIDATION_ERROR', message: 'Datos invalidos', details: errors } }, { status: 400 });
+    return NextResponse.json(
+      {
+        data: null,
+        error: { code: 'VALIDATION_ERROR', message: 'Datos invalidos', details: errors },
+      },
+      { status: 400 }
+    );
   }
 
   // Check max pending tasks
@@ -56,7 +87,16 @@ export async function POST(req: NextRequest) {
     .eq('status', 'pending');
 
   if (count && count >= 50) {
-    return NextResponse.json({ data: null, error: { code: 'MAX_TASKS', message: 'Tienes mas de 50 tareas pendientes. Completa o cancela algunas.' } }, { status: 400 });
+    return NextResponse.json(
+      {
+        data: null,
+        error: {
+          code: 'MAX_TASKS',
+          message: 'Tienes mas de 50 tareas pendientes. Completa o cancela algunas.',
+        },
+      },
+      { status: 400 }
+    );
   }
 
   const { data, error } = await supabase
@@ -73,6 +113,10 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ data: null, error: { code: 'SERVER_ERROR', message: error.message } }, { status: 500 });
+  if (error)
+    return NextResponse.json(
+      { data: null, error: { code: 'SERVER_ERROR', message: error.message } },
+      { status: 500 }
+    );
   return NextResponse.json({ data, error: null }, { status: 201 });
 }

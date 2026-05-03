@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 import type { PendingTask } from '../types';
 
 interface Props {
@@ -30,10 +30,17 @@ export function PendingTasksPreview({ tasks, total }: Props) {
       ) : (
         <div className="space-y-2">
           {tasks.map((task) => (
-            <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <AlertCircle className={`w-4 h-4 flex-shrink-0 ${task.difficulty === 'high' ? 'text-red-500' : 'text-gray-400'}`} />
+            <div
+              key={task.id}
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <AlertCircle
+                className={`w-4 h-4 flex-shrink-0 ${task.difficulty === 'high' ? 'text-red-500' : 'text-gray-400'}`}
+              />
               <span className="text-sm text-gray-700 flex-1 truncate">{task.title}</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${difficultyColors[task.difficulty] || 'bg-gray-100 text-gray-600'}`}>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${difficultyColors[task.difficulty] || 'bg-gray-100 text-gray-600'}`}
+              >
                 {task.difficulty}
               </span>
             </div>

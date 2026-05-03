@@ -4,9 +4,7 @@ export function AnalysisEmpty() {
   return (
     <div className="text-center py-12 px-4">
       <span className="text-4xl">📊</span>
-      <h3 className="mt-4 text-lg font-semibold text-gray-900">
-        Sin datos de analisis
-      </h3>
+      <h3 className="mt-4 text-lg font-semibold text-gray-900">Sin datos de analisis</h3>
       <p className="mt-1 text-sm text-gray-500 max-w-xs mx-auto">
         Registra tareas y tu estado emocional para que podamos calcular tu carga academica.
       </p>

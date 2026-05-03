@@ -1,18 +1,18 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
 import {
+  AnalysisEmpty,
+  LoadBreakdown,
+  LoadHistoryChart,
   LoadIndicator,
   StressAlert,
-  LoadHistoryChart,
-  LoadBreakdown,
-  AnalysisEmpty,
   useLoadAnalysis,
   useLoadHistory,
 } from '@/modules/analysis';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
-import { useRouter } from 'next/navigation';
 
 export default function AnalisisPage() {
   const router = useRouter();
@@ -20,7 +20,12 @@ export default function AnalisisPage() {
   const [historyDays] = useState(7);
   const { data: history, loading: historyLoading } = useLoadHistory(historyDays);
 
-  if (loading) return <AppShell title="Analisis de Carga"><PageLoading /></AppShell>;
+  if (loading)
+    return (
+      <AppShell title="Analisis de Carga">
+        <PageLoading />
+      </AppShell>
+    );
 
   if (error) {
     return (

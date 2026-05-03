@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { recommendationService } from '../services/recommendation-service';
-import type { Recommendation, RecommendationsResponse } from '../types';
+import type { RecommendationsResponse } from '../types';
 
 export function useRecommendations() {
   const [data, setData] = useState<RecommendationsResponse | null>(null);
@@ -37,7 +37,12 @@ export function useRecommendations() {
   }, []);
 
   const sendFeedback = useCallback(
-    async (recommendationId: string, loadAnalysisId: string, actionTaken: string | null, wasHelpful: boolean | null) => {
+    async (
+      recommendationId: string,
+      loadAnalysisId: string,
+      actionTaken: string | null,
+      wasHelpful: boolean | null
+    ) => {
       try {
         await recommendationService.sendFeedback(
           recommendationId,

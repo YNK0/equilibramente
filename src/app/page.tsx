@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { useEffect, useState } from 'react';
 import { MoodPicker } from '@/modules/emotional/components/mood-picker';
 import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
 import { emotionalService } from '@/modules/emotional/services/emotional-service';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
 import type { EmotionalCheckin } from '@/modules/emotional/types';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
 
 export default function DashboardPage() {
   const [todayCheckin, setTodayCheckin] = useState<EmotionalCheckin | null>(null);
@@ -15,13 +15,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const init = async () => {
-      try { setTodayCheckin(await emotionalService.getToday()); } catch {}
+      try {
+        setTodayCheckin(await emotionalService.getToday());
+      } catch {}
       setLoading(false);
     };
     init();
   }, []);
 
-  if (loading) return <AppShell title="Inicio"><PageLoading /></AppShell>;
+  if (loading)
+    return (
+      <AppShell title="Inicio">
+        <PageLoading />
+      </AppShell>
+    );
 
   if (!todayCheckin) {
     return (

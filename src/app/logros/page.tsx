@@ -1,8 +1,8 @@
 'use client';
 
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
-import { StreakDisplay } from '@/modules/achievements/components/streak-display';
 import { AchievementsGrid } from '@/modules/achievements/components/achievements-grid';
+import { StreakDisplay } from '@/modules/achievements/components/streak-display';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
 
 export default function LogrosPage() {
   return (

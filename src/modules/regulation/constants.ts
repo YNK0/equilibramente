@@ -1,4 +1,4 @@
-import type { BreathingPattern, BreathingPatternKey, ActivePauseExercise } from './types';
+import type { ActivePauseExercise, BreathingPattern, BreathingPatternKey } from './types';
 
 export const BREATHING_PATTERNS: Record<BreathingPatternKey, BreathingPattern> = {
   '4-7-8': {

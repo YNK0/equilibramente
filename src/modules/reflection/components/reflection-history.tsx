@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { STAR_LABELS } from '../constants';
 import { reflectionService } from '../services/reflection-service';
 import type { DailyReflection } from '../types';
-import { STAR_LABELS } from '../constants';
 
 export function ReflectionHistory() {
   const [reflections, setReflections] = useState<DailyReflection[]>([]);
@@ -12,7 +12,8 @@ export function ReflectionHistory() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    reflectionService.getHistory()
+    reflectionService
+      .getHistory()
       .then(setReflections)
       .finally(() => setLoading(false));
   }, []);
@@ -54,17 +55,17 @@ export function ReflectionHistory() {
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900">
-                {new Date(r.reflection_date).toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}
+                {new Date(r.reflection_date).toLocaleDateString('es-MX', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                })}
               </span>
               <div className="flex items-center gap-2">
                 {r.day_rating && (
-                  <span className="text-xs text-gray-500">
-                    {STAR_LABELS[r.day_rating]}
-                  </span>
+                  <span className="text-xs text-gray-500">{STAR_LABELS[r.day_rating]}</span>
                 )}
-                <span className="text-xs text-gray-400">
-                  {expanded === r.id ? '▲' : '▼'}
-                </span>
+                <span className="text-xs text-gray-400">{expanded === r.id ? '▲' : '▼'}</span>
               </div>
             </div>
 
@@ -98,7 +99,10 @@ export function ReflectionHistory() {
                     {r.day_rating && (
                       <div className="flex items-center gap-1 pt-1">
                         <span className="text-xs text-gray-500">Día:</span>
-                        <span>{'⭐'.repeat(r.day_rating)}{'☆'.repeat(5 - r.day_rating)}</span>
+                        <span>
+                          {'⭐'.repeat(r.day_rating)}
+                          {'☆'.repeat(5 - r.day_rating)}
+                        </span>
                       </div>
                     )}
                   </div>

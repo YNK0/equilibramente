@@ -22,9 +22,10 @@ export function DifficultySelect({ value, onChange, error }: Props) {
             className={`
               flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors
               focus:outline-none focus:ring-2 focus:ring-purple-200
-              ${value === config.value
-                ? `${config.borderColor} ${config.bgColor} ${config.textColor} ring-1`
-                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+              ${
+                value === config.value
+                  ? `${config.borderColor} ${config.bgColor} ${config.textColor} ring-1`
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
               }
             `}
           >

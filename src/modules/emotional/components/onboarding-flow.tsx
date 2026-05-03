@@ -1,7 +1,7 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { pageEnter, pageTransition } from '@/lib/motion';
 
 interface Props {
@@ -22,7 +22,8 @@ const STEPS = [
   {
     emoji: '🧠',
     title: 'Esto nos ayuda a ayudarte',
-    description: 'Conocer como te sientes nos permite recomendarte acciones para manejar mejor tu carga.',
+    description:
+      'Conocer como te sientes nos permite recomendarte acciones para manejar mejor tu carga.',
   },
 ];
 
@@ -30,7 +31,7 @@ export function OnboardingFlow({ onComplete }: Props) {
   const [step, setStep] = useState(0);
 
   const next = () => {
-    if (step < STEPS.length - 1) setStep(s => s + 1);
+    if (step < STEPS.length - 1) setStep((s) => s + 1);
     else onComplete();
   };
 

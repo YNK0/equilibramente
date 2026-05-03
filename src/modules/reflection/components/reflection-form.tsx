@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { useCallback, useState } from 'react';
+import { DAILY_QUESTIONS } from '../constants';
+import { useReflection } from '../hooks/use-reflection';
 import { QuestionPrompt } from './question-prompt';
 import { StarRating } from './star-rating';
-import { useReflection } from '../hooks/use-reflection';
-import { DAILY_QUESTIONS } from '../constants';
 
 export function ReflectionForm() {
   const [step, setStep] = useState(0);
@@ -21,7 +21,7 @@ export function ReflectionForm() {
 
   const handleNext = useCallback(() => {
     if (step < questionsCount) setStep(step + 1);
-  }, [step, questionsCount]);
+  }, [step]);
 
   const handleSave = useCallback(async () => {
     const hasAnyAnswer = Object.values(answers).some((a) => a.trim().length > 0) || rating > 0;
@@ -39,9 +39,7 @@ export function ReflectionForm() {
     return (
       <div className="flex flex-col items-center gap-4 p-8 text-center">
         <span className="text-5xl">🌱</span>
-        <h3 className="text-xl font-semibold text-gray-900">
-          Gracias por reflexionar
-        </h3>
+        <h3 className="text-xl font-semibold text-gray-900">Gracias por reflexionar</h3>
         <p className="text-sm text-gray-500">
           Mañana será mejor. Cada reflexión te ayuda a conocerte.
         </p>
@@ -70,9 +68,7 @@ export function ReflectionForm() {
 
   return (
     <div className="flex flex-col items-center gap-6 p-6">
-      <h3 className="text-lg font-semibold text-gray-900">
-        En general, ¿cómo estuvo tu día?
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900">En general, ¿cómo estuvo tu día?</h3>
       <StarRating value={rating} onChange={setRating} />
       <button
         onClick={handleSave}
@@ -81,9 +77,7 @@ export function ReflectionForm() {
       >
         {saving ? 'Guardando...' : 'Completar reflexión'}
       </button>
-      <p className="text-xs text-gray-400">
-        O salta sin responder — cero presión
-      </p>
+      <p className="text-xs text-gray-400">O salta sin responder — cero presión</p>
     </div>
   );
 }

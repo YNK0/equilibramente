@@ -1,11 +1,13 @@
 import { createClient } from '@/lib/supabase/client';
-import type { RegulationSession, AudioResource, RegulationHistory } from '../types';
 import type { Database } from '@/types/database';
+import type { AudioResource, RegulationHistory, RegulationSession } from '../types';
 
 const supabase = createClient();
 
 async function getUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -31,7 +33,7 @@ export const regulationService = {
     id: string,
     durationSeconds: number,
     moodAfter?: string | null,
-    loadAnalysisId?: string | null,
+    loadAnalysisId?: string | null
   ): Promise<RegulationSession> {
     if (durationSeconds < 30) {
       await supabase.from('regulation_sessions').delete().eq('id', id);
@@ -85,7 +87,10 @@ export const regulationService = {
     let mostUsedType = 'breathing';
     let maxCount = 0;
     for (const [t, c] of Object.entries(typeCount)) {
-      if (c > maxCount) { maxCount = c; mostUsedType = t; }
+      if (c > maxCount) {
+        maxCount = c;
+        mostUsedType = t;
+      }
     }
 
     return {

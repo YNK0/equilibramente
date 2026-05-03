@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { LoadLevel } from '../types';
 import { LOAD_LEVEL_CONFIGS } from '../constants';
+import type { LoadLevel } from '../types';
 
 interface Props {
   level: LoadLevel | null;
@@ -56,9 +56,7 @@ export function LoadIndicator({ level, score, trend, loading }: Props) {
         />
       </div>
 
-      {score !== undefined && (
-        <p className="text-xs text-gray-400 text-right">Score: {score}</p>
-      )}
+      {score !== undefined && <p className="text-xs text-gray-400 text-right">Score: {score}</p>}
     </div>
   );
 }

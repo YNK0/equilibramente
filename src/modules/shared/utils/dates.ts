@@ -1,13 +1,12 @@
 import {
   differenceInHours,
+  eachDayOfInterval,
+  endOfWeek,
   format,
   formatDistanceToNow,
   isToday,
   isTomorrow,
-  isBefore,
   startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -15,7 +14,7 @@ export function formatDueDate(dateStr: string): string {
   const date = new Date(dateStr);
   if (isToday(date)) return 'Hoy';
   if (isTomorrow(date)) return 'Manana';
-  return format(date, "d MMM", { locale: es });
+  return format(date, 'd MMM', { locale: es });
 }
 
 export function formatRelativeDate(dateStr: string): string {
@@ -37,7 +36,7 @@ export function getWeekDays() {
   const now = new Date();
   const start = startOfWeek(now, { weekStartsOn: 1 });
   const end = endOfWeek(now, { weekStartsOn: 1 });
-  return eachDayOfInterval({ start, end }).map(d => ({
+  return eachDayOfInterval({ start, end }).map((d) => ({
     date: format(d, 'yyyy-MM-dd'),
     label: format(d, 'EEE', { locale: es }).replace('.', ''),
     isToday: isToday(d),

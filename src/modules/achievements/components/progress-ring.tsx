@@ -13,7 +13,10 @@ export function ProgressRing({ unlocked, total, size = 120 }: ProgressRingProps)
   const offset = circumference * (1 - progress);
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} className="transform -rotate-90">
         <circle
           cx={size / 2}

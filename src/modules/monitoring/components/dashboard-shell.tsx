@@ -1,13 +1,13 @@
 'use client';
 
-import { useDashboard } from '../hooks/use-dashboard';
-import { LoadCard } from './load-card';
-import { TodaySummary } from './today-summary';
-import { StreakRow } from './streak-row';
-import { MoodSparkline } from './mood-sparkline';
-import { PendingTasksPreview } from './pending-tasks-preview';
 import { MoodPicker } from '@/modules/emotional/components/mood-picker';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
+import { useDashboard } from '../hooks/use-dashboard';
+import { LoadCard } from './load-card';
+import { MoodSparkline } from './mood-sparkline';
+import { PendingTasksPreview } from './pending-tasks-preview';
+import { StreakRow } from './streak-row';
+import { TodaySummary } from './today-summary';
 
 interface Props {
   onCheckinComplete?: () => void;
@@ -21,7 +21,12 @@ export function DashboardShell({ onCheckinComplete }: Props) {
       <div className="p-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <h2 className="text-sm font-semibold text-gray-700 mb-3">¿Cómo te sientes hoy?</h2>
-          <MoodPicker onComplete={() => { refresh(); onCheckinComplete?.(); }} />
+          <MoodPicker
+            onComplete={() => {
+              refresh();
+              onCheckinComplete?.();
+            }}
+          />
         </div>
       </div>
     );

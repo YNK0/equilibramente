@@ -1,22 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
-import { MoodPicker } from '@/modules/emotional/components/mood-picker';
-import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
-import { TaskList } from '@/modules/tasks/components/task-list';
-import { MiniLoadIndicator } from '@/modules/tasks/components/mini-load-indicator';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { LoadIndicator } from '@/modules/analysis/components/load-indicator';
 import { StressAlert } from '@/modules/analysis/components/stress-alert';
-import { RecommendationBanner } from '@/modules/recommendations/components/recommendation-banner';
-import { emotionalService } from '@/modules/emotional/services/emotional-service';
 import { useLoadAnalysis } from '@/modules/analysis/hooks/use-load-analysis';
-import { useRecommendations } from '@/modules/recommendations/hooks/use-recommendations';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import type { EmotionalCheckin } from '@/modules/emotional/types';
 import type { LoadLevel } from '@/modules/analysis/types';
+import { MoodPicker } from '@/modules/emotional/components/mood-picker';
+import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banner';
+import { emotionalService } from '@/modules/emotional/services/emotional-service';
+import type { EmotionalCheckin } from '@/modules/emotional/types';
+import { RecommendationBanner } from '@/modules/recommendations/components/recommendation-banner';
+import { useRecommendations } from '@/modules/recommendations/hooks/use-recommendations';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,11 +24,18 @@ export default function DashboardPage() {
   const { recommendations, loadLevel, dismiss, sendFeedback } = useRecommendations();
 
   useEffect(() => {
-    emotionalService.getToday().then(setTodayCheckin).finally(() => setLoadingCheckin(false));
+    emotionalService
+      .getToday()
+      .then(setTodayCheckin)
+      .finally(() => setLoadingCheckin(false));
   }, []);
 
   if (loadingCheckin || loadingAnalysis) {
-    return <AppShell title="EquilibraMente"><PageLoading /></AppShell>;
+    return (
+      <AppShell title="EquilibraMente">
+        <PageLoading />
+      </AppShell>
+    );
   }
 
   const currentLevel = analysis?.current?.load_level as LoadLevel | undefined;
@@ -43,7 +48,7 @@ export default function DashboardPage() {
           recommendations={recommendations}
           loadLevel={loadLevel as LoadLevel | null}
           onDismiss={dismiss}
-          onAction={(id) => router.push('/recomendaciones')}
+          onAction={(_id) => router.push('/recomendaciones')}
         />
 
         {/* Check-in Section */}
@@ -52,12 +57,12 @@ export default function DashboardPage() {
             <MoodStateBanner checkin={todayCheckin} onChange={() => setTodayCheckin(null)} />
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h2 className="text-sm font-semibold text-gray-700 mb-3">
-                Como te sientes hoy?
-              </h2>
-              <MoodPicker onComplete={() => {
-                emotionalService.getToday().then(setTodayCheckin);
-              }} />
+              <h2 className="text-sm font-semibold text-gray-700 mb-3">Como te sientes hoy?</h2>
+              <MoodPicker
+                onComplete={() => {
+                  emotionalService.getToday().then(setTodayCheckin);
+                }}
+              />
             </div>
           )}
         </section>
@@ -71,10 +76,7 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <LoadIndicator
-            level={currentLevel ?? null}
-            score={analysis?.current?.load_score}
-          />
+          <LoadIndicator level={currentLevel ?? null} score={analysis?.current?.load_score} />
 
           <StressAlert
             level={currentLevel ?? null}

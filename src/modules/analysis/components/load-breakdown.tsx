@@ -1,7 +1,7 @@
 'use client';
 
-import type { LoadAnalysis } from '../types';
 import { LOAD_LEVEL_CONFIGS } from '../constants';
+import type { LoadAnalysis } from '../types';
 
 interface Props {
   analysis: LoadAnalysis;
@@ -11,7 +11,9 @@ export function LoadBreakdown({ analysis }: Props) {
   const config = LOAD_LEVEL_CONFIGS[analysis.load_level as keyof typeof LOAD_LEVEL_CONFIGS];
 
   return (
-    <div className={`p-4 rounded-xl border ${config?.borderColor ?? 'border-gray-200'} ${config?.bgColor ?? 'bg-gray-50'}`}>
+    <div
+      className={`p-4 rounded-xl border ${config?.borderColor ?? 'border-gray-200'} ${config?.bgColor ?? 'bg-gray-50'}`}
+    >
       <h4 className="text-sm font-semibold text-gray-700 mb-3">Desglose de carga</h4>
 
       <div className="space-y-2">
@@ -39,7 +41,9 @@ export function LoadBreakdown({ analysis }: Props) {
 
         <hr className="border-gray-200" />
 
-        <div className={`flex justify-between text-sm font-semibold ${config?.textColor ?? 'text-gray-700'}`}>
+        <div
+          className={`flex justify-between text-sm font-semibold ${config?.textColor ?? 'text-gray-700'}`}
+        >
           <span>Nivel</span>
           <span>{config?.label ?? analysis.load_level}</span>
         </div>

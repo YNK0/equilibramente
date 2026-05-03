@@ -1,0 +1,50 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.14/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/public",
+      "!**/coverage",
+      "!**/supabase/functions",
+      "!**/src/types/database.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn"
+      },
+      "style": {
+        "useConst": "error",
+        "useTemplate": "error",
+        "useNodejsImportProtocol": "off"
+      },
+      "complexity": {
+        "noBannedTypes": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "semicolons": "always"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { achievementService } from '../services/achievement-service';
 import type { Achievement, AchievementsSummary } from '../types';
 
@@ -10,7 +10,8 @@ export function useAchievements() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    achievementService.getAll()
+    achievementService
+      .getAll()
       .then((res) => {
         setAchievements(res.achievements);
         setSummary(res.summary);

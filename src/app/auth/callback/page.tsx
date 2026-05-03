@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const confirmed = searchParams.get('confirmed');
-  const [status, setStatus] = useState<'loading' | 'confirmed' | 'redirecting' | 'error'>('loading');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [status, setStatus] = useState<'loading' | 'confirmed' | 'redirecting' | 'error'>(
+    'loading'
+  );
+  const [errorMsg, _setErrorMsg] = useState('');
   const processed = useRef(false);
 
   useEffect(() => {
@@ -29,7 +30,9 @@ function CallbackContent() {
     const maxAttempts = 20;
     const interval = setInterval(async () => {
       attempts++;
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (session) {
         clearInterval(interval);
@@ -89,14 +92,16 @@ function CallbackContent() {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-purple-50/30 px-4">
-        <div className="w-full max-w-sm text-center">
-          <div className="text-4xl mb-4 animate-pulse">&#129504;</div>
-          <h1 className="text-xl font-bold text-gray-900">Cargando...</h1>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-purple-50/30 px-4">
+          <div className="w-full max-w-sm text-center">
+            <div className="text-4xl mb-4 animate-pulse">&#129504;</div>
+            <h1 className="text-xl font-bold text-gray-900">Cargando...</h1>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <CallbackContent />
     </Suspense>
   );

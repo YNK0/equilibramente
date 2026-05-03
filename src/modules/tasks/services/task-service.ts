@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { Task, TaskInsert, TaskUpdate, TaskFilters, TaskStats, Difficulty } from '../types';
+import type { Task, TaskFilters, TaskInsert, TaskStats, TaskUpdate } from '../types';
 
 const supabase = createClient();
 
@@ -31,11 +31,7 @@ export const taskService = {
   },
 
   async getById(id: string): Promise<Task> {
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await supabase.from('tasks').select('*').eq('id', id).single();
     if (error) throw error;
     return data;
   },
@@ -54,7 +50,11 @@ export const taskService = {
   async complete(id: string): Promise<Task> {
     const { data, error } = await supabase
       .from('tasks')
-      .update({ status: 'completed', completed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id)
       .select()
       .single();
@@ -71,28 +71,32 @@ export const taskService = {
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
 
-    const { data: all } = await supabase.from('tasks').select('status, difficulty, completed_at, due_date');
+    const { data: all } = await supabase
+      .from('tasks')
+      .select('status, difficulty, completed_at, due_date');
 
     const tasks = all ?? [];
-    const pending = tasks.filter(t => t.status === 'pending');
-    const completed = tasks.filter(t => t.status === 'completed');
-    const completedToday = completed.filter(t => t.completed_at?.startsWith(today)).length;
-    const completedWeek = completed.filter(t => t.completed_at && t.completed_at >= weekAgo).length;
-    const urgentCount = pending.filter(t => {
+    const pending = tasks.filter((t) => t.status === 'pending');
+    const completed = tasks.filter((t) => t.status === 'completed');
+    const completedToday = completed.filter((t) => t.completed_at?.startsWith(today)).length;
+    const completedWeek = completed.filter(
+      (t) => t.completed_at && t.completed_at >= weekAgo
+    ).length;
+    const urgentCount = pending.filter((t) => {
       if (!t.due_date) return false;
       const days = Math.ceil((new Date(t.due_date).getTime() - Date.now()) / 86400000);
       return days <= 1;
     }).length;
 
-    const total = tasks.filter(t => t.status !== 'cancelled').length;
+    const total = tasks.filter((t) => t.status !== 'cancelled').length;
     const completionRate = total > 0 ? completed.length / total : 0;
 
     return {
       pending: {
         total: pending.length,
-        high: pending.filter(t => t.difficulty === 'high').length,
-        medium: pending.filter(t => t.difficulty === 'medium').length,
-        low: pending.filter(t => t.difficulty === 'low').length,
+        high: pending.filter((t) => t.difficulty === 'high').length,
+        medium: pending.filter((t) => t.difficulty === 'medium').length,
+        low: pending.filter((t) => t.difficulty === 'low').length,
       },
       completed_today: completedToday,
       completed_week: completedWeek,

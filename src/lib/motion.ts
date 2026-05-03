@@ -1,4 +1,4 @@
-import type { Variants, Transition } from 'framer-motion';
+import type { Transition, Variants } from 'framer-motion';
 
 export const pageEnter: Variants = {
   hidden: { opacity: 0, y: 12 },

@@ -1,10 +1,10 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { RecommendationCard } from './recommendation-card';
-import type { Recommendation } from '../types';
 import type { LoadLevel } from '@/modules/analysis/types';
+import type { Recommendation } from '../types';
+import { RecommendationCard } from './recommendation-card';
 
 interface Props {
   recommendations: Recommendation[];
@@ -26,7 +26,9 @@ export function RecommendationBanner({ recommendations, loadLevel, onDismiss, on
   if (!recommendations?.length) return null;
 
   const top = recommendations[0];
-  const style = loadLevel ? URGENCY_STYLES[loadLevel] ?? 'bg-purple-50 border-purple-200' : 'bg-purple-50 border-purple-200';
+  const style = loadLevel
+    ? (URGENCY_STYLES[loadLevel] ?? 'bg-purple-50 border-purple-200')
+    : 'bg-purple-50 border-purple-200';
 
   return (
     <div className="sticky top-0 z-10">

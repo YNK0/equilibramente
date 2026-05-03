@@ -1,8 +1,8 @@
 'use client';
 
-import { StreakBar } from './streak-bar';
-import { useStreaks } from '../hooks/use-streaks';
 import { STREAK_LABELS } from '../constants';
+import { useStreaks } from '../hooks/use-streaks';
+import { StreakBar } from './streak-bar';
 
 function getWeekdays(): boolean[] {
   const days: boolean[] = [];
@@ -32,9 +32,7 @@ export function StreakDisplay() {
   if (streaks.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-100 bg-white p-4 text-center">
-        <p className="text-sm text-gray-500">
-          Empieza tu primera racha. ¡Haz un check-in hoy!
-        </p>
+        <p className="text-sm text-gray-500">Empieza tu primera racha. ¡Haz un check-in hoy!</p>
       </div>
     );
   }
@@ -42,24 +40,31 @@ export function StreakDisplay() {
   return (
     <div className="space-y-3">
       {streaks.map((streak) => (
-        <div key={streak.type} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div
+          key={streak.type}
+          className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">
-                {streak.current_count >= 30 ? '💎' : streak.current_count >= 14 ? '🌟' : streak.current_count >= 7 ? '⭐' : streak.current_count >= 3 ? '🔥' : '⚡'}
+                {streak.current_count >= 30
+                  ? '💎'
+                  : streak.current_count >= 14
+                    ? '🌟'
+                    : streak.current_count >= 7
+                      ? '⭐'
+                      : streak.current_count >= 3
+                        ? '🔥'
+                        : '⚡'}
               </span>
               <div>
                 <p className="text-sm font-medium text-gray-900">
                   {STREAK_LABELS[streak.type] || streak.type}
                 </p>
-                <p className="text-xs text-gray-500">
-                  Record: {streak.longest_count} días
-                </p>
+                <p className="text-xs text-gray-500">Record: {streak.longest_count} días</p>
               </div>
             </div>
-            <span className="text-xl font-bold text-purple-600">
-              {streak.current_count}
-            </span>
+            <span className="text-xl font-bold text-purple-600">{streak.current_count}</span>
           </div>
           <StreakBar days={weekdays} />
         </div>

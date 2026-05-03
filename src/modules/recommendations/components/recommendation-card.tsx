@@ -1,9 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { ACTION_LABELS, ACTION_ROUTES, CATEGORY_ICONS } from '../constants';
 import type { Recommendation, RecommendationCategory } from '../types';
-import { ACTION_ROUTES, ACTION_LABELS, CATEGORY_ICONS } from '../constants';
 
 interface Props {
   recommendation: Recommendation;

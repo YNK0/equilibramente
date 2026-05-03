@@ -1,5 +1,5 @@
-import type { MoodLevel } from '@/modules/emotional/types';
 import type { LoadLevel } from '@/modules/analysis/types';
+import type { MoodLevel } from '@/modules/emotional/types';
 
 export interface TodayData {
   date: string;

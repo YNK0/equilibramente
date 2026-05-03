@@ -36,7 +36,9 @@ export function MoodComparison({ before, after, onAfterChange }: Props) {
         <div className="flex items-center gap-4 text-sm">
           <span className="text-gray-400">Antes: {moodLabels[before]?.emoji}</span>
           <span className="text-gray-300">→</span>
-          <span className="text-gray-600">Ahora: {selected ? moodLabels[selected]?.emoji : '?'}</span>
+          <span className="text-gray-600">
+            Ahora: {selected ? moodLabels[selected]?.emoji : '?'}
+          </span>
         </div>
       )}
 
@@ -47,7 +49,9 @@ export function MoodComparison({ before, after, onAfterChange }: Props) {
             key={key}
             onClick={() => setSelected(selected === key ? null : key)}
             className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
-              selected === key ? 'ring-2 ring-purple-500 bg-purple-50 scale-105' : 'hover:bg-gray-50'
+              selected === key
+                ? 'ring-2 ring-purple-500 bg-purple-50 scale-105'
+                : 'hover:bg-gray-50'
             }`}
             title={label}
           >

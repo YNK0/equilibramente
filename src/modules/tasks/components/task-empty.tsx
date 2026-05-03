@@ -17,8 +17,7 @@ export function TaskEmpty({ hasFilter, onCreateTask }: Props) {
       <p className="mt-1 text-sm text-gray-500 max-w-xs">
         {hasFilter
           ? 'Cambia el filtro para ver otras tareas.'
-          : 'Crea tu primera tarea y empieza a organizar tu carga academica.'
-        }
+          : 'Crea tu primera tarea y empieza a organizar tu carga academica.'}
       </p>
       {!hasFilter && (
         <button

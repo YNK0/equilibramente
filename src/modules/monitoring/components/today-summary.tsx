@@ -30,7 +30,9 @@ function TasksCard({ completed, total }: TasksCardProps) {
   return (
     <div className="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100">
       <span className="text-2xl">✅</span>
-      <span className="text-xs font-medium text-gray-700">{completed} de {total}</span>
+      <span className="text-xs font-medium text-gray-700">
+        {completed} de {total}
+      </span>
       <span className="text-[10px] text-gray-400">completadas</span>
     </div>
   );

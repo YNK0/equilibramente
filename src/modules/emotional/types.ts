@@ -2,7 +2,11 @@ import type { Database } from '@/types/database';
 
 export type MoodLevel = 'great' | 'okay' | 'stressed' | 'overwhelmed';
 export type EmotionalCheckin = Database['public']['Tables']['emotional_checkins']['Row'];
-export type CheckinCreateInput = { mood: MoodLevel; intensity?: number | null; note?: string | null };
+export type CheckinCreateInput = {
+  mood: MoodLevel;
+  intensity?: number | null;
+  note?: string | null;
+};
 
 export interface MoodConfig {
   value: MoodLevel;

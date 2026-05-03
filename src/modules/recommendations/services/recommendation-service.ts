@@ -65,15 +65,13 @@ export const recommendationService = {
         .eq('id', existing.id);
       if (error) throw error;
     } else {
-      const { error } = await supabase
-        .from('recommendation_logs')
-        .insert({
-          user_id: userId,
-          recommendation_id: recommendationId,
-          load_analysis_id: loadAnalysisId,
-          action_taken: actionTaken,
-          was_helpful: wasHelpful,
-        });
+      const { error } = await supabase.from('recommendation_logs').insert({
+        user_id: userId,
+        recommendation_id: recommendationId,
+        load_analysis_id: loadAnalysisId,
+        action_taken: actionTaken,
+        was_helpful: wasHelpful,
+      });
       if (error) throw error;
     }
   },

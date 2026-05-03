@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { regulationService } from '../services/regulation-service';
 import type { RegulationSession } from '../types';
 
@@ -9,7 +9,11 @@ interface UseRegulationSessionResult {
   isStarting: boolean;
   isCompleting: boolean;
   startSession: (type: string, moodBefore?: string | null) => Promise<RegulationSession>;
-  completeSession: (durationSeconds: number, moodAfter?: string | null, loadAnalysisId?: string | null) => Promise<void>;
+  completeSession: (
+    durationSeconds: number,
+    moodAfter?: string | null,
+    loadAnalysisId?: string | null
+  ) => Promise<void>;
   cancelSession: () => Promise<void>;
 }
 
@@ -29,20 +33,28 @@ export function useRegulationSession(): UseRegulationSessionResult {
     }
   }, []);
 
-  const completeSession = useCallback(async (durationSeconds: number, moodAfter?: string | null, loadAnalysisId?: string | null) => {
-    if (!session) return;
-    setIsCompleting(true);
-    try {
-      if (durationSeconds < 30) {
-        await regulationService.cancelSession(session.id);
-        setSession(null);
-        return;
+  const completeSession = useCallback(
+    async (durationSeconds: number, moodAfter?: string | null, loadAnalysisId?: string | null) => {
+      if (!session) return;
+      setIsCompleting(true);
+      try {
+        if (durationSeconds < 30) {
+          await regulationService.cancelSession(session.id);
+          setSession(null);
+          return;
+        }
+        await regulationService.completeSession(
+          session.id,
+          durationSeconds,
+          moodAfter,
+          loadAnalysisId
+        );
+      } finally {
+        setIsCompleting(false);
       }
-      await regulationService.completeSession(session.id, durationSeconds, moodAfter, loadAnalysisId);
-    } finally {
-      setIsCompleting(false);
-    }
-  }, [session]);
+    },
+    [session]
+  );
 
   const cancelSession = useCallback(async () => {
     if (!session) return;

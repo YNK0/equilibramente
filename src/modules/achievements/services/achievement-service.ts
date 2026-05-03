@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { Achievement, Streak, AchievementsSummary } from '../types';
+import type { Achievement, AchievementsSummary, Streak } from '../types';
 
 const supabase = createClient();
 
@@ -10,9 +10,7 @@ export const achievementService = {
       supabase.from('user_achievements').select('achievement_id, unlocked_at'),
     ]);
 
-    const unlockedMap = new Map(
-      (userUnlocked || []).map((u) => [u.achievement_id, u.unlocked_at]),
-    );
+    const unlockedMap = new Map((userUnlocked || []).map((u) => [u.achievement_id, u.unlocked_at]));
 
     const achievements: Achievement[] = (allAchievements || []).map((a) => {
       const unlockedAt = unlockedMap.get(a.id) || null;

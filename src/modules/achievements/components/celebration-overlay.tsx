@@ -1,7 +1,7 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import type { Achievement } from '../types';
 
@@ -40,7 +40,7 @@ export function CelebrationOverlay() {
 
             setTimeout(() => setLatest(null), 5000);
           }
-        },
+        }
       )
       .subscribe();
 
@@ -65,12 +65,8 @@ export function CelebrationOverlay() {
             className="bg-white rounded-3xl p-8 text-center mx-4 max-w-sm w-full"
           >
             <span className="text-7xl block mb-4">{latest.icon}</span>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              ¡Logro desbloqueado!
-            </h2>
-            <h3 className="text-lg font-semibold text-purple-600 mb-2">
-              {latest.title}
-            </h3>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">¡Logro desbloqueado!</h2>
+            <h3 className="text-lg font-semibold text-purple-600 mb-2">{latest.title}</h3>
             <p className="text-sm text-gray-600 mb-6">{latest.description}</p>
             <button
               onClick={() => setLatest(null)}

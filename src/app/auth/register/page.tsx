@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { type FormEvent, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -61,8 +61,8 @@ export default function RegisterPage() {
           <div className="text-4xl mb-4">&#9993;</div>
           <h1 className="text-xl font-bold text-gray-900">Confirma tu correo</h1>
           <p className="mt-2 text-sm text-gray-500">
-            Enviamos un enlace de confirmacion a <strong>{email}</strong>.
-            Abrelo para activar tu cuenta y empezar a usar EquilibraMente.
+            Enviamos un enlace de confirmacion a <strong>{email}</strong>. Abrelo para activar tu
+            cuenta y empezar a usar EquilibraMente.
           </p>
           <Link
             href="/auth/login"
@@ -81,9 +81,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">&#127891;</div>
           <h1 className="text-2xl font-bold text-gray-900">Crear cuenta</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Empieza tu viaje de autorregulacion
-          </p>
+          <p className="mt-1 text-sm text-gray-500">Empieza tu viaje de autorregulacion</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -136,7 +134,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Confirmar contrasena
             </label>
             <input
@@ -151,9 +152,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
           <button
             type="submit"

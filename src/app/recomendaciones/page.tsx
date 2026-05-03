@@ -1,15 +1,20 @@
 'use client';
 
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
-import { RecommendationList, useRecommendations } from '@/modules/recommendations';
-import { PageLoading } from '@/modules/shared/components/ui/loading';
 import type { LoadLevel } from '@/modules/analysis/types';
+import { RecommendationList, useRecommendations } from '@/modules/recommendations';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
+import { PageLoading } from '@/modules/shared/components/ui/loading';
 
 export default function RecomendacionesPage() {
   const { recommendations, loadLevel, loading, error, dismiss, sendFeedback } =
     useRecommendations();
 
-  if (loading) return <AppShell title="Recomendaciones"><PageLoading /></AppShell>;
+  if (loading)
+    return (
+      <AppShell title="Recomendaciones">
+        <PageLoading />
+      </AppShell>
+    );
 
   return (
     <AppShell title="Recomendaciones">

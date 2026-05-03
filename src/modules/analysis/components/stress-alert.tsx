@@ -1,8 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { LoadLevel } from '../types';
-import { LOAD_LEVEL_CONFIGS } from '../constants';
 
 interface Props {
   level: LoadLevel | null;
@@ -25,7 +24,9 @@ export function StressAlert({ level, onAction, onDismiss }: Props) {
           <div className="flex items-start gap-3">
             <span className="text-xl">{level === 'critical' ? '⚠️' : '⚡'}</span>
             <div className="flex-1 min-w-0">
-              <p className={`font-semibold text-sm ${level === 'critical' ? 'text-red-800' : 'text-orange-800'}`}>
+              <p
+                className={`font-semibold text-sm ${level === 'critical' ? 'text-red-800' : 'text-orange-800'}`}
+              >
                 {level === 'critical' ? 'Carga critica detectada' : 'Carga alta detectada'}
               </p>
               <p className="text-xs mt-0.5 text-gray-600">

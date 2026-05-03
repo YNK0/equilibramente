@@ -1,11 +1,13 @@
 import { createClient } from '@/lib/supabase/client';
-import type { TodayData, WeekData, PendingTask, RangeData } from '../types';
-import type { MoodLevel, LoadLevel } from '@/types/database';
+import type { LoadLevel, MoodLevel } from '@/types/database';
+import type { PendingTask, RangeData, TodayData, WeekData } from '../types';
 
 const supabase = createClient();
 
 async function getUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -24,10 +26,7 @@ export const monitoringService = {
       .limit(1)
       .maybeSingle();
 
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('status')
-      .eq('user_id', userId);
+    const { data: tasks } = await supabase.from('tasks').select('status').eq('user_id', userId);
 
     const allTasks = tasks ?? [];
     const { data: load } = await supabase
@@ -54,15 +53,24 @@ export const monitoringService = {
 
     return {
       date: today,
-      checkin: checkin ? { mood: checkin.mood as MoodLevel, intensity: checkin.intensity ?? 0 } : null,
+      checkin: checkin
+        ? { mood: checkin.mood as MoodLevel, intensity: checkin.intensity ?? 0 }
+        : null,
       tasks: {
         total: allTasks.length,
         completed: allTasks.filter((t) => t.status === 'completed').length,
         pending: allTasks.filter((t) => t.status !== 'completed').length,
       },
       load: { level: (load?.load_level as LoadLevel) ?? null, score: load?.load_score ?? null },
-      regulation: { sessions: reg.length, total_seconds: reg.reduce((sum, s) => sum + (s.duration_seconds ?? 0), 0) },
-      streak: { type: 'checkin', current: streak?.current_count ?? 0, longest: streak?.longest_count ?? 0 },
+      regulation: {
+        sessions: reg.length,
+        total_seconds: reg.reduce((sum, s) => sum + (s.duration_seconds ?? 0), 0),
+      },
+      streak: {
+        type: 'checkin',
+        current: streak?.current_count ?? 0,
+        longest: streak?.longest_count ?? 0,
+      },
     };
   },
 
@@ -114,7 +122,9 @@ export const monitoringService = {
       const d = new Date(monday);
       d.setDate(monday.getDate() + i);
       const dateStr = d.toISOString().split('T')[0];
-      const tasksCompleted = tasks?.filter((t) => t.status === 'completed' && t.completed_at?.startsWith(dateStr)).length ?? 0;
+      const tasksCompleted =
+        tasks?.filter((t) => t.status === 'completed' && t.completed_at?.startsWith(dateStr))
+          .length ?? 0;
       days.push({
         date: dateStr,
         mood: (checkinMap.get(dateStr) as MoodLevel) ?? null,
@@ -126,14 +136,27 @@ export const monitoringService = {
 
     const moods = days.filter((d) => d.mood).map((d) => d.mood!);
     const moodValues: Record<string, number> = { great: 5, okay: 3.5, stressed: 2, overwhelmed: 1 };
-    const avgMood = moods.length > 0 ? moods.reduce((sum, m) => sum + (moodValues[m] || 0), 0) / moods.length : 0;
+    const avgMood =
+      moods.length > 0 ? moods.reduce((sum, m) => sum + (moodValues[m] || 0), 0) / moods.length : 0;
 
     const firstHalf = moods.slice(0, Math.ceil(moods.length / 2));
     const secondHalf = moods.slice(Math.ceil(moods.length / 2));
-    const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / firstHalf.length : 0;
-    const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / secondHalf.length : 0;
+    const firstAvg =
+      firstHalf.length > 0
+        ? firstHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / firstHalf.length
+        : 0;
+    const secondAvg =
+      secondHalf.length > 0
+        ? secondHalf.reduce((s, m) => s + (moodValues[m] || 0), 0) / secondHalf.length
+        : 0;
     const trend: 'improving' | 'stable' | 'worsening' =
-      moods.length < 2 ? 'stable' : secondAvg > firstAvg ? 'improving' : secondAvg < firstAvg ? 'worsening' : 'stable';
+      moods.length < 2
+        ? 'stable'
+        : secondAvg > firstAvg
+          ? 'improving'
+          : secondAvg < firstAvg
+            ? 'worsening'
+            : 'stable';
 
     const { data: streaks } = await supabase
       .from('streaks')

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { RecommendationCard } from '../components/recommendation-card';
 import type { Recommendation } from '../types';
 
@@ -17,16 +17,11 @@ const mkRec = (overrides: Partial<Recommendation> = {}): Recommendation =>
     trigger_condition: { load_level: ['high', 'critical'] },
     created_at: '2026-01-01T00:00:00Z',
     ...overrides,
-  } as Recommendation);
+  }) as Recommendation;
 
 describe('RecommendationCard', () => {
   it('renders title and description', () => {
-    render(
-      <RecommendationCard
-        recommendation={mkRec()}
-        onDismiss={vi.fn()}
-      />
-    );
+    render(<RecommendationCard recommendation={mkRec()} onDismiss={vi.fn()} />);
     expect(screen.getByText('Divide y venceras')).toBeTruthy();
     expect(screen.getByText('Divide la tarea en 3 pasos')).toBeTruthy();
   });
@@ -43,10 +38,7 @@ describe('RecommendationCard', () => {
 
   it('shows action button for emotional category', () => {
     render(
-      <RecommendationCard
-        recommendation={mkRec({ category: 'emotional' })}
-        onDismiss={vi.fn()}
-      />
+      <RecommendationCard recommendation={mkRec({ category: 'emotional' })} onDismiss={vi.fn()} />
     );
     expect(screen.getByText('Iniciar respiracion')).toBeTruthy();
   });
@@ -64,22 +56,14 @@ describe('RecommendationCard', () => {
 
   it('calls onDismiss when Ignorar clicked', () => {
     const onDismiss = vi.fn();
-    render(
-      <RecommendationCard
-        recommendation={mkRec()}
-        onDismiss={onDismiss}
-      />
-    );
+    render(<RecommendationCard recommendation={mkRec()} onDismiss={onDismiss} />);
     fireEvent.click(screen.getByText('Ignorar'));
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
   it('shows priority dots', () => {
     const { container } = render(
-      <RecommendationCard
-        recommendation={mkRec({ priority: 3 })}
-        onDismiss={vi.fn()}
-      />
+      <RecommendationCard recommendation={mkRec({ priority: 3 })} onDismiss={vi.fn()} />
     );
     const dots = container.querySelectorAll('.w-1.h-3');
     expect(dots.length).toBe(3);

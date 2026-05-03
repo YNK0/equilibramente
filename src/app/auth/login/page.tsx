@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { type FormEvent, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -88,9 +88,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
           <button
             type="submit"

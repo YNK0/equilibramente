@@ -1,17 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { AppShell } from '@/modules/shared/components/layout/app-shell';
-import { BreathingExercise } from '@/modules/regulation/components/breathing-exercise';
-import { AudioGrid } from '@/modules/regulation/components/audio-grid';
+import { Headphones, Pause, Wind } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { ActivePause } from '@/modules/regulation/components/active-pause';
-import { RegulationEmpty } from '@/modules/regulation/components/regulation-empty';
-import { regulationService } from '@/modules/regulation/services/regulation-service';
+import { AudioGrid } from '@/modules/regulation/components/audio-grid';
+import { BreathingExercise } from '@/modules/regulation/components/breathing-exercise';
+import type { AudioResource, RegulationType } from '@/modules/regulation/types';
+import { AppShell } from '@/modules/shared/components/layout/app-shell';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
-import { Wind, Headphones, Pause } from 'lucide-react';
-import type { AudioResource } from '@/modules/regulation/types';
-import type { RegulationType } from '@/modules/regulation/types';
 
 type View = 'menu' | RegulationType;
 

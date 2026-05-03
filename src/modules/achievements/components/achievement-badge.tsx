@@ -27,7 +27,9 @@ export function AchievementBadge({ achievement, onClick }: AchievementBadgeProps
           <span className="absolute -bottom-0.5 -right-0.5 text-xs">🔒</span>
         )}
       </span>
-      <span className={`text-[11px] font-medium leading-tight ${achievement.unlocked ? 'text-gray-800' : 'text-gray-400'}`}>
+      <span
+        className={`text-[11px] font-medium leading-tight ${achievement.unlocked ? 'text-gray-800' : 'text-gray-400'}`}
+      >
         {achievement.title}
       </span>
     </button>

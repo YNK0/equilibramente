@@ -23,9 +23,10 @@ export function MoodCard({ config, onSelect, disabled, isSelected }: Props) {
         flex flex-col items-center gap-3 rounded-2xl border p-6
         transition-colors min-h-[120px]
         focus:outline-none focus:ring-2 focus:ring-purple-400
-        ${isSelected
-          ? 'border-purple-300 bg-purple-50 ring-2 ring-purple-200'
-          : 'border-gray-100 bg-white shadow-sm'
+        ${
+          isSelected
+            ? 'border-purple-300 bg-purple-50 ring-2 ring-purple-200'
+            : 'border-gray-100 bg-white shadow-sm'
         }
       `}
       aria-label={config.label}

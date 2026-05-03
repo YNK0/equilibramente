@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { analysisService } from '../services/analysis-service';
 import { onAnalysisNeedsRefresh } from '../services/analysis-trigger';
 import type { AnalysisCurrent } from '../types';
