@@ -1,30 +1,48 @@
 -- Migration: Database triggers for automatic load analysis
--- Sprint 3 — Integracion: cada vez que cambian tareas o check-in, recalcular carga
+-- Sprint 3 — Integracion
+--
+-- IMPORTANT: Before running, set your secrets via Supabase SQL Editor:
+--
+--   CREATE OR REPLACE FUNCTION trigger_load_analysis()
+--   RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
+--   AS $$
+--   DECLARE
+--     target_user_id uuid;
+--     edge_function_url text := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/analyze-load';
+--     service_role_jwt text := 'YOUR_SERVICE_ROLE_JWT';
+--   BEGIN
+--     ...
+--   END;
+--   $$;
+--
+-- Then run:
+--   SELECT cron.schedule('process-analysis-queue', '*/5 * * * *', '...');
 
 -- Trigger function: call analyze-load Edge Function
+-- NOTE: This is a TEMPLATE. Deploy via Supabase Dashboard with actual secrets.
 CREATE OR REPLACE FUNCTION trigger_load_analysis()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 DECLARE
   target_user_id uuid;
+  edge_function_url text := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/analyze-load';
+  service_role_jwt text := '<YOUR_SERVICE_ROLE_JWT>';
 BEGIN
-  -- Determine the user_id from the affected row
   IF TG_OP = 'DELETE' THEN
     target_user_id := OLD.user_id;
   ELSE
     target_user_id := NEW.user_id;
   END IF;
 
-  -- Call the Edge Function asynchronously via pg_net
-  -- Requires pg_net extension to be enabled
   PERFORM
     net.http_post(
-      url := CONCAT(current_setting('app.edge_function_url'), '/analyze-load'),
+      url := edge_function_url,
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', CONCAT('Bearer ', current_setting('app.service_role_key'))
+        'Authorization', CONCAT('Bearer ', service_role_jwt)
       ),
       body := jsonb_build_object('user_id', target_user_id),
       timeout_milliseconds := 5000
