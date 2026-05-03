@@ -1,15 +1,7 @@
 import type { NextConfig } from 'next';
 import withPWA from 'next-pwa';
 
-const nextConfig: NextConfig = {
-  experimental: {
-    turbo: {
-      resolveExtensions: [
-        '.mdx', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.json',
-      ],
-    },
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default withPWA({
   dest: 'public',
