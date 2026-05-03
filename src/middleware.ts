@@ -1,9 +1,25 @@
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
+
+  // Rate limit API routes
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { allowed, remaining } = rateLimit(ip);
+
+    res.headers.set('X-RateLimit-Remaining', String(remaining));
+
+    if (!allowed) {
+      return NextResponse.json(
+        { data: null, error: { code: 'RATE_LIMITED', message: 'Demasiadas solicitudes. Espera un momento.' } },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      );
+    }
+  }
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

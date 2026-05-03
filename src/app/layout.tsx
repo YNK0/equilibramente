@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegister } from '@/modules/shared';
 import { AppRouterCacheProvider } from './providers';
 import './globals.css';
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TooltipProvider>
             <ServiceWorkerRegister />
             {children}
+            <Analytics />
           </TooltipProvider>
         </AppRouterCacheProvider>
       </body>
