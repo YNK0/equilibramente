@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import { AppRouterCacheProvider } from './providers';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'EquilibraMente',
@@ -24,13 +31,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" className={inter.variable}>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="antialiased text-gray-900 bg-purple-50/30 min-h-screen">
+      <body className="antialiased text-gray-900 bg-purple-50/30 min-h-screen font-sans">
         <AppRouterCacheProvider>
-          {children}
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

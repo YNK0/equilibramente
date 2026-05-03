@@ -15,7 +15,7 @@ export function AppShell({ children, title, showNav = true }: Props) {
   return (
     <div className="min-h-screen bg-purple-50/30">
       {title && <TopBar title={title} />}
-      <main className={showNav ? 'pb-20' : ''}>
+      <main className={`max-w-lg mx-auto ${showNav ? 'pb-20' : ''}`}>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
