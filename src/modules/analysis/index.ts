@@ -6,5 +6,6 @@ export { AnalysisEmpty } from './components/analysis-empty';
 export { useLoadAnalysis } from './hooks/use-load-analysis';
 export { useLoadHistory } from './hooks/use-load-history';
 export { calculateLoad, getLoadLevel, computeTrend } from './utils/load-calculator';
+export { triggerAnalysisRefresh, onAnalysisNeedsRefresh } from './services/analysis-trigger';
 export { LOAD_LEVEL_CONFIGS } from './constants';
 export type { LoadAnalysis, LoadLevel, LoadResult, LoadInput, LoadTrend } from './types';

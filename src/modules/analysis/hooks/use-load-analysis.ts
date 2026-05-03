@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { analysisService } from '../services/analysis-service';
-import type { AnalysisCurrent, LoadAnalysis } from '../types';
+import { onAnalysisNeedsRefresh } from '../services/analysis-trigger';
+import type { AnalysisCurrent } from '../types';
 
 export function useLoadAnalysis() {
   const [analysis, setAnalysis] = useState<AnalysisCurrent | null>(null);
@@ -24,6 +25,11 @@ export function useLoadAnalysis() {
 
   useEffect(() => {
     fetch();
+  }, [fetch]);
+
+  // Listen for refresh triggers from checkin/task mutations
+  useEffect(() => {
+    return onAnalysisNeedsRefresh(fetch);
   }, [fetch]);
 
   return { analysis, loading, error, refetch: fetch };

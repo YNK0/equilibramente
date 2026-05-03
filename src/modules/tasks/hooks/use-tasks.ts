@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { taskService } from '../services/task-service';
+import { triggerAnalysisRefresh } from '@/modules/analysis/services/analysis-trigger';
 import type { Task, TaskInsert, TaskUpdate, TaskFilters, TaskStatus } from '../types';
 
 export function useTasks(initialStatus: TaskStatus = 'pending') {
@@ -25,6 +26,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
 
   const create = async (input: TaskInsert) => {
     const task = await taskService.create(input);
+    triggerAnalysisRefresh();
     if (task.status === filters.status) {
       setTasks(prev => [task, ...prev]);
       setCount(c => c + 1);
@@ -34,6 +36,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
 
   const updateTask = async (id: string, input: TaskUpdate) => {
     const updated = await taskService.update(id, input);
+    triggerAnalysisRefresh();
     if (updated.status === filters.status) {
       setTasks(prev => prev.map(t => t.id === id ? updated : t));
     } else {
@@ -45,6 +48,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
 
   const completeTask = async (id: string) => {
     const task = await taskService.complete(id);
+    triggerAnalysisRefresh();
     if (filters.status === 'completed') {
       setTasks(prev => [task, ...prev]);
       setCount(c => c + 1);
@@ -57,6 +61,7 @@ export function useTasks(initialStatus: TaskStatus = 'pending') {
 
   const removeTask = async (id: string) => {
     await taskService.remove(id);
+    triggerAnalysisRefresh();
     setTasks(prev => prev.filter(t => t.id !== id));
     setCount(c => c - 1);
   };

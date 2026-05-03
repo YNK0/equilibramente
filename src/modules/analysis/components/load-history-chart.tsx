@@ -38,7 +38,7 @@ export function LoadHistoryChart({ data, loading }: Props) {
     .reverse()
     .map((a) => ({
       date: new Date(a.created_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' }),
-      score: (a as Record<string, unknown>).load_score as number ?? 0,
+      score: a.load_score,
       level: a.load_level,
     }));
 

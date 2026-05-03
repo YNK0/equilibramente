@@ -154,6 +154,7 @@ export type Database = {
           id: string
           last_mood: string | null
           load_level: string
+          load_score: number
           recommendation_ids: string[] | null
           task_count: number
           upcoming_deadlines_count: number
@@ -165,6 +166,7 @@ export type Database = {
           id?: string
           last_mood?: string | null
           load_level: string
+          load_score?: number
           recommendation_ids?: string[] | null
           task_count?: number
           upcoming_deadlines_count?: number
@@ -176,6 +178,7 @@ export type Database = {
           id?: string
           last_mood?: string | null
           load_level?: string
+          load_score?: number
           recommendation_ids?: string[] | null
           task_count?: number
           upcoming_deadlines_count?: number

@@ -8,6 +8,7 @@ import { MoodStateBanner } from '@/modules/emotional/components/mood-state-banne
 import { OnboardingFlow } from '@/modules/emotional/components/onboarding-flow';
 import { emotionalService } from '@/modules/emotional/services/emotional-service';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
+import { triggerAnalysisRefresh } from '@/modules/analysis/services/analysis-trigger';
 import type { EmotionalCheckin } from '@/modules/emotional/types';
 
 export default function CheckinPage() {
@@ -37,6 +38,7 @@ export default function CheckinPage() {
   };
 
   const handleCheckinComplete = () => {
+    triggerAnalysisRefresh();
     router.push('/');
     router.refresh();
   };
