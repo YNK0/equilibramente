@@ -1,0 +1,11 @@
+export { DashboardShell } from './components/dashboard-shell';
+export { TodaySummary } from './components/today-summary';
+export { StreakRow } from './components/streak-row';
+export { MoodSparkline } from './components/mood-sparkline';
+export { LoadCard } from './components/load-card';
+export { PendingTasksPreview } from './components/pending-tasks-preview';
+export { WeeklyReport } from './components/weekly-report';
+export { useDashboard } from './hooks/use-dashboard';
+export { useWeeklyReport } from './hooks/use-weekly-report';
+export { monitoringService } from './services/monitoring-service';
+export type { TodayData, WeekData, WeekDay, PendingTask } from './types';
