@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ActivePause } from '@/modules/regulation/components/active-pause';
 import { AudioGrid } from '@/modules/regulation/components/audio-grid';
 import { BreathingExercise } from '@/modules/regulation/components/breathing-exercise';
+import { regulationService } from '@/modules/regulation/services/regulation-service';
 import type { AudioResource, RegulationType } from '@/modules/regulation/types';
 import { AppShell } from '@/modules/shared/components/layout/app-shell';
 import { PageLoading } from '@/modules/shared/components/ui/loading';
@@ -19,10 +20,10 @@ export default function RegularPage() {
   useEffect(() => {
     if (view === 'audio') {
       setLoading(true);
-      fetch('/api/regulation/audios')
-        .then((r) => r.json())
-        .then((d) => setAudios(d.data ?? []))
-        .finally(() => setLoading(false));
+      regulationService.getAudios().then((data) => {
+        const withUrls = data.map((a) => ({ ...a, audio_url: null }));
+        setAudios(withUrls);
+      }).finally(() => setLoading(false));
     }
   }, [view]);
 

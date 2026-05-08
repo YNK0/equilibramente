@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { LoadLevel } from '@/modules/analysis/types';
 import type { RecommendationsResponse } from '../types';
 
@@ -11,6 +13,7 @@ async function getUserId(): Promise<string> {
 
 export const recommendationService = {
   async getCurrent(): Promise<RecommendationsResponse> {
+    if (isGuest()) return getGuestStore().getCurrentRecommendations();
     const { data: analyses, error: analysisError } = await supabase
       .from('load_analyses')
       .select('load_level, recommendation_ids')
@@ -46,6 +49,7 @@ export const recommendationService = {
     actionTaken: string | null,
     wasHelpful: boolean | null
   ): Promise<void> {
+    if (isGuest()) { getGuestStore().sendRecommendationFeedback(recommendationId, loadAnalysisId, actionTaken, wasHelpful); return; }
     const userId = await getUserId();
     if (!userId) throw new Error('Not authenticated');
 

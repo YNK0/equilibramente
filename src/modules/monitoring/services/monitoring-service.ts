@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { LoadLevel, MoodLevel } from '@/types/database';
 import type { PendingTask, RangeData, TodayData, WeekData } from '../types';
 
@@ -14,6 +16,7 @@ async function getUserId(): Promise<string> {
 
 export const monitoringService = {
   async getToday(): Promise<TodayData> {
+    if (isGuest()) return getGuestStore().getMonitoringToday();
     const userId = await getUserId();
     const today = new Date().toISOString().split('T')[0];
 
@@ -75,6 +78,7 @@ export const monitoringService = {
   },
 
   async getWeek(): Promise<WeekData> {
+    if (isGuest()) return getGuestStore().getMonitoringWeek();
     const userId = await getUserId();
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -183,6 +187,7 @@ export const monitoringService = {
   },
 
   async getPendingTasks(limit = 3): Promise<PendingTask[]> {
+    if (isGuest()) return getGuestStore().getPendingTasks(limit);
     const userId = await getUserId();
     const { data } = await supabase
       .from('tasks')
@@ -196,6 +201,7 @@ export const monitoringService = {
   },
 
   async getRange(from: string, to: string): Promise<RangeData> {
+    if (isGuest()) return getGuestStore().getMonitoringRange(from, to);
     const userId = await getUserId();
     const { data: checkins } = await supabase
       .from('emotional_checkins')

@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { Json } from '@/types/database';
 import type {
   NotificationPrefs,
@@ -11,6 +13,7 @@ import type {
 
 export const profileService = {
   async get(): Promise<Profile> {
+    if (isGuest()) return getGuestStore().getProfile();
     const supabase = createClient();
     const { data, error } = await supabase.from('profiles').select('*').single();
     if (error) throw error;
@@ -18,6 +21,7 @@ export const profileService = {
   },
 
   async update(input: ProfileUpdateInput): Promise<Profile> {
+    if (isGuest()) return getGuestStore().updateProfile(input);
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;
@@ -35,6 +39,7 @@ export const profileService = {
   },
 
   async getNotificationPrefs(): Promise<NotificationPrefs> {
+    if (isGuest()) return getGuestStore().getNotificationPrefs();
     const supabase = createClient();
     const { data, error } = await supabase.from('notification_preferences').select('*').single();
     if (error) throw error;
@@ -42,6 +47,7 @@ export const profileService = {
   },
 
   async updateNotificationPrefs(input: NotificationPrefsUpdate): Promise<NotificationPrefs> {
+    if (isGuest()) return getGuestStore().updateNotificationPrefs(input);
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;
@@ -59,6 +65,7 @@ export const profileService = {
   },
 
   async subscribePush(subscription: PushSubscriptionJSON): Promise<void> {
+    if (isGuest()) { getGuestStore().subscribePush(subscription); return; }
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;
@@ -73,6 +80,7 @@ export const profileService = {
   },
 
   async unsubscribePush(): Promise<void> {
+    if (isGuest()) { getGuestStore().unsubscribePush(); return; }
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;
@@ -87,6 +95,7 @@ export const profileService = {
   },
 
   async getStats(): Promise<ProfileStats> {
+    if (isGuest()) return getGuestStore().getProfileStats();
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;
@@ -145,6 +154,7 @@ export const profileService = {
   },
 
   async uploadAvatar(file: File): Promise<string> {
+    if (isGuest()) return getGuestStore().uploadAvatar(file);
     const supabase = createClient();
     const { data: user } = await supabase.auth.getUser();
     const userId = user.user?.id;

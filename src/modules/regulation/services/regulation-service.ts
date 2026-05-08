@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { Database } from '@/types/database';
 import type { AudioResource, RegulationHistory, RegulationSession } from '../types';
 
@@ -14,6 +16,7 @@ async function getUserId(): Promise<string> {
 
 export const regulationService = {
   async startSession(type: string, moodBefore?: string | null): Promise<RegulationSession> {
+    if (isGuest()) return getGuestStore().startRegulationSession(type, moodBefore);
     const userId = await getUserId();
     const { data, error } = await supabase
       .from('regulation_sessions')
@@ -35,8 +38,10 @@ export const regulationService = {
     moodAfter?: string | null,
     loadAnalysisId?: string | null
   ): Promise<RegulationSession> {
+    if (isGuest()) return getGuestStore().completeRegulationSession(id, durationSeconds, moodAfter, loadAnalysisId);
+    const userId = await getUserId();
     if (durationSeconds < 30) {
-      await supabase.from('regulation_sessions').delete().eq('id', id);
+      await supabase.from('regulation_sessions').delete().eq('id', id).eq('user_id', userId);
       throw new Error('Sessions under 30 seconds are not saved');
     }
     const { data, error } = await supabase
@@ -47,17 +52,30 @@ export const regulationService = {
         load_analysis_id: loadAnalysisId ?? null,
       } as Database['public']['Tables']['regulation_sessions']['Update'])
       .eq('id', id)
+      .eq('user_id', userId)
       .select()
       .single();
     if (error) throw error;
+
+    // Fire-and-forget: check achievements (first breath, zen master, etc.)
+    const rpc = supabase.rpc as (fn: string, args?: Record<string, unknown>) => PromiseLike<unknown>;
+    void (async () => {
+      try {
+        await rpc('check_achievements', { p_user_id: userId });
+      } catch { /* non-critical */ }
+    })();
+
     return data;
   },
 
   async cancelSession(id: string): Promise<void> {
-    await supabase.from('regulation_sessions').delete().eq('id', id);
+    if (isGuest()) { getGuestStore().cancelRegulationSession(id); return; }
+    const userId = await getUserId();
+    await supabase.from('regulation_sessions').delete().eq('id', id).eq('user_id', userId);
   },
 
   async getAudios(): Promise<AudioResource[]> {
+    if (isGuest()) return getGuestStore().getAudios() as AudioResource[];
     const { data, error } = await supabase
       .from('audio_resources')
       .select('*')
@@ -68,10 +86,13 @@ export const regulationService = {
   },
 
   async getHistory(days = 30): Promise<RegulationHistory> {
+    if (isGuest()) return getGuestStore().getRegulationHistory(days);
+    const userId = await getUserId();
     const since = new Date(Date.now() - days * 86400000).toISOString();
     const { data, error } = await supabase
       .from('regulation_sessions')
       .select('*')
+      .eq('user_id', userId)
       .gte('created_at', since)
       .order('created_at', { ascending: false });
     if (error) throw error;
@@ -101,10 +122,11 @@ export const regulationService = {
     };
   },
 
-  getSignedUrl(storagePath: string): Promise<string> {
+  getSignedUrl(_storagePath: string): Promise<string> {
+    if (isGuest()) return Promise.resolve('');
     return supabase.storage
       .from('audio-resources')
-      .createSignedUrl(storagePath, 3600)
+      .createSignedUrl(_storagePath, 3600)
       .then(({ data }) => data?.signedUrl ?? '');
   },
 };

@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { enterGuest } from '@/lib/guest-mode';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
@@ -169,6 +172,23 @@ export default function RegisterPage() {
             Iniciar sesion
           </Link>
         </p>
+
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={() => {
+              enterGuest();
+              router.push('/');
+              router.refresh();
+            }}
+            className="w-full rounded-xl border-2 border-dashed border-purple-300 px-4 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors"
+          >
+            Probar sin registrarme
+          </button>
+          <p className="mt-2 text-center text-xs text-gray-400">
+            Modo invitado — tus datos se guardan solo en este navegador y se pierden al cerrar la ventana
+          </p>
+        </div>
       </div>
     </div>
   );

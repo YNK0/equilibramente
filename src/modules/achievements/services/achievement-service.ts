@@ -1,13 +1,25 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { Achievement, AchievementsSummary, Streak } from '../types';
 
 const supabase = createClient();
 
+async function getUserId(): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  return user.id;
+}
+
 export const achievementService = {
   async getAll(): Promise<{ achievements: Achievement[]; summary: AchievementsSummary }> {
+    if (isGuest()) return getGuestStore().getAllAchievements();
+    const userId = await getUserId();
     const [{ data: allAchievements }, { data: userUnlocked }] = await Promise.all([
       supabase.from('achievements').select('*').order('tier', { ascending: true }),
-      supabase.from('user_achievements').select('achievement_id, unlocked_at'),
+      supabase.from('user_achievements').select('achievement_id, unlocked_at').eq('user_id', userId),
     ]);
 
     const unlockedMap = new Map((userUnlocked || []).map((u) => [u.achievement_id, u.unlocked_at]));
@@ -35,12 +47,15 @@ export const achievementService = {
   },
 
   async getStreaks(): Promise<Streak[]> {
+    if (isGuest()) return getGuestStore().getStreaks();
+    const userId = await getUserId();
     const { data, error } = await supabase
       .from('streaks')
       .select('type, current_count, longest_count, last_activity_date')
+      .eq('user_id', userId)
       .order('type');
 
     if (error) throw error;
-    return data;
+    return data ?? [];
   },
 };

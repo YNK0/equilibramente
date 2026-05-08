@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { isOnline, offlineDB } from '@/lib/offline-db';
 import { emotionalService } from '../services/emotional-service';
 import type { CheckinCreateInput } from '../types';
@@ -9,6 +9,15 @@ export function useCheckin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
+
+  // Sync pending mutations when back online
+  useEffect(() => {
+    const handleOnline = () => {
+      offlineDB.syncPendingMutations();
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   const submit = useCallback(async (input: CheckinCreateInput) => {
     setLoading(true);

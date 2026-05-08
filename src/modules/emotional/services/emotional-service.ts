@@ -1,15 +1,30 @@
 import { createClient } from '@/lib/supabase/client';
+import { isGuest } from '@/lib/guest-mode';
+import { getGuestStore } from '@/lib/guest-store';
 import type { CheckinCreateInput, EmotionalCheckin, MoodLevel, MoodStats } from '../types';
 
 const supabase = createClient();
 
+async function getUserId(): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  return user.id;
+}
+
 export const emotionalService = {
   async createOrUpdate(input: CheckinCreateInput): Promise<EmotionalCheckin> {
+    if (isGuest()) return getGuestStore().createOrUpdateCheckin(input);
+    const userId = await getUserId();
+    const today = new Date().toISOString().split('T')[0];
+
     const { data: existing } = await supabase
       .from('emotional_checkins')
       .select('id')
-      .gte('created_at', new Date().toISOString().split('T')[0])
-      .single();
+      .eq('user_id', userId)
+      .gte('created_at', today)
+      .maybeSingle();
 
     if (existing) {
       const { data, error } = await supabase
@@ -24,29 +39,50 @@ export const emotionalService = {
 
     const { data, error } = await supabase
       .from('emotional_checkins')
-      .insert(input as EmotionalCheckin)
+      .insert({ ...input, user_id: userId })
       .select()
       .single();
     if (error) throw error;
+
+    // Fire-and-forget: update streak + check achievements
+    const rpc = supabase.rpc as (fn: string, args?: Record<string, unknown>) => PromiseLike<unknown>;
+    void (async () => {
+      try {
+        await rpc('update_streak', {
+          p_user_id: userId,
+          p_type: 'checkin',
+          p_activity_date: today,
+        });
+        await rpc('check_achievements', { p_user_id: userId });
+      } catch { /* non-critical */ }
+    })();
+
     return data;
   },
 
   async getToday(): Promise<EmotionalCheckin | null> {
+    if (isGuest()) return getGuestStore().getTodayCheckin();
+    const userId = await getUserId();
     const today = new Date().toISOString().split('T')[0];
     const { data } = await supabase
       .from('emotional_checkins')
       .select('*')
+      .eq('user_id', userId)
       .gte('created_at', today)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     return data ?? null;
   },
 
   async list(limit = 30, offset = 0, from?: string, to?: string) {
+    if (isGuest()) return getGuestStore().listCheckins(limit, offset, from, to);
+    const userId = await getUserId();
+
     let query = supabase
       .from('emotional_checkins')
       .select('*', { count: 'exact' })
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -59,12 +95,15 @@ export const emotionalService = {
   },
 
   async getStats(days = 7): Promise<MoodStats> {
+    if (isGuest()) return getGuestStore().getCheckinStats(days);
+    const userId = await getUserId();
     const to = new Date().toISOString().split('T')[0];
     const from = new Date(Date.now() - (days - 1) * 86400000).toISOString().split('T')[0];
 
     const { data, error } = await supabase
       .from('emotional_checkins')
       .select('mood, intensity, created_at')
+      .eq('user_id', userId)
       .gte('created_at', from)
       .lte('created_at', `${to}T23:59:59`)
       .order('created_at', { ascending: false });
@@ -88,8 +127,6 @@ export const emotionalService = {
     const moods = checkins.map((c) => c.mood as MoodLevel);
     let trend: MoodStats['mood_trend'] = 'stable';
     if (checkins.length >= 3) {
-      const _positive = moods.filter((m) => m === 'great' || m === 'okay').length;
-      const _negative = moods.filter((m) => m === 'stressed' || m === 'overwhelmed').length;
       const recent = checkins.slice(0, Math.ceil(checkins.length / 2));
       const older = checkins.slice(Math.ceil(checkins.length / 2));
       const recentPositive = recent.filter((m) => ['great', 'okay'].includes(m.mood)).length;
@@ -102,7 +139,7 @@ export const emotionalService = {
       period: { from, to },
       total_checkins: checkins.length,
       mood_distribution: distribution,
-      current_streak: 0, // computed by edge function
+      current_streak: 0,
       avg_intensity: checkins.length > 0 ? totalIntensity / checkins.length : 0,
       most_frequent_mood: getMostFrequent(distribution),
       mood_trend: trend,

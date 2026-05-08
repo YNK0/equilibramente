@@ -50,8 +50,11 @@ export async function middleware(req: NextRequest) {
   // API routes handle auth themselves
   if (req.nextUrl.pathname.startsWith('/api/auth')) return res;
 
-  // Redirect to login if no session
-  if (!session) {
+  // Guest mode — cookie-based bypass
+  const isGuest = req.cookies.get('equilibramente-guest')?.value === 'true';
+
+  // Redirect to login if no session and not guest
+  if (!session && !isGuest) {
     const redirectUrl = new URL('/auth/login', req.url);
     redirectUrl.searchParams.set('returnUrl', req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
