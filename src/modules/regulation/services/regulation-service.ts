@@ -122,11 +122,11 @@ export const regulationService = {
     };
   },
 
-  getSignedUrl(_storagePath: string): Promise<string> {
-    if (isGuest()) return Promise.resolve('');
+  getSignedUrl(storagePath: string): Promise<string> {
+    if (isGuest()) return Promise.resolve(`/audio/${storagePath}`);
     return supabase.storage
       .from('audio-resources')
-      .createSignedUrl(_storagePath, 3600)
+      .createSignedUrl(storagePath, 3600)
       .then(({ data }) => data?.signedUrl ?? '');
   },
 };

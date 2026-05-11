@@ -12,8 +12,13 @@ export default function AudiosPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    regulationService.getAudios().then((data) => {
-      const withUrls = data.map((a) => ({ ...a, audio_url: null }));
+    regulationService.getAudios().then(async (data) => {
+      const withUrls = await Promise.all(
+        data.map(async (a) => ({
+          ...a,
+          audio_url: await regulationService.getSignedUrl(a.storage_path),
+        }))
+      );
       setAudios(withUrls);
     }).finally(() => setLoading(false));
   }, []);

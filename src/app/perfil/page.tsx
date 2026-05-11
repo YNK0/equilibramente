@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { createClient } from '@/lib/supabase/client';
+import { exitGuest, isGuest } from '@/lib/guest-mode';
 import {
   AppInfo,
   NotificationToggles,
@@ -24,6 +25,11 @@ export default function PerfilPage() {
   const [editing, setEditing] = useState(false);
 
   const handleLogout = useCallback(async () => {
+    if (isGuest()) {
+      exitGuest();
+      router.push('/auth/login');
+      return;
+    }
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push('/auth/login');
